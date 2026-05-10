@@ -16,6 +16,9 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 - **SQLAlchemy + pyodbc** como puente de conexión entre Python y SQL Server
 - **Driver ODBC 18 para SQL Server**
 
+**Se recomienda crear un entorno virtual para instalar las librerias necesarias**
+**pip install pandas sqlalchemy pyodbc**
+
 ---
 
 ## Arquitectura del Flujo ETL
