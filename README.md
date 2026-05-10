@@ -16,22 +16,45 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 - **SQLAlchemy + pyodbc** como puente de conexión entre Python y SQL Server
 - **Driver ODBC 18 para SQL Server**
 
-**Se recomienda crear un entorno virtual para instalar las librerias necesarias**
-**pip install pandas sqlalchemy pyodbc**
+**Se recomienda crear un entorno virtual para instalar las librerías necesarias:**
+
+1. Crear el entorno virtual:
+   ```bash
+   python -m venv venv
+   ```
+
+2. Activar el entorno virtual:
+   - En Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - En Linux/Mac:
+     ```bash
+     source venv/bin/activate
+     ```
+
+3. Instalar las librerías requeridas:
+   ```bash
+   pip install pandas sqlalchemy pyodbc
+   ```
 
 ---
 
-## Arquitectura del Flujo ETL
+## Flujos de Trabajo
+
+El proyecto contempla **dos flujos de ejecución** bien diferenciados:
+
+### Flujo 1: Carga Inicial (primera vez)
 
 ```
-┌──────────────┐       ┌──────────────────┐       ┌───────────────────┐       ┌──────────────┐
-│              │       │                  │       │                   │       │              │
-│  Archivos    │──────▶│  01_staging_    │──────▶│  02_staging_     │──────▶│  03_carga_   │
-│  CSV Fuente  │       │  area.py        │       │  clean.py         │       │  dw.py        │
-│              │       │                  │       │                   │       │              │
-└──────────────┘       └──────────────────┘       └───────────────────┘       └──────────────┘
-                              │                           │                          │
-                              ▼                           ▼                          ▼
+┌──────────────┐       ┌──────────────────┐       ┌───────────────────┐       ┌──────────────────────┐
+│              │       │                  │       │                   │       │                      │
+│  Archivos    │──────▶│  01_staging_    │──────▶│  02_staging_     │──────▶│  03_carga_Inicial_   │
+│  CSV Fuente  │       │  area.py        │       │  clean.py         │       │  dw.py                │
+│              │       │                  │       │                   │       │                      │
+└──────────────┘       └──────────────────┘       └───────────────────┘       └──────────────────────┘
+                              │                           │                           │
+                              ▼                           ▼                           ▼
                      ┌──────────────────┐       ┌───────────────────┐       ┌──────────────────┐
                      │ CentroMas_       │       │ CentroMas_        │       │ CentroMas_       │
                      │ Staging          │       │ Staging_Clean     │       │ DW               │
@@ -39,21 +62,47 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
                      └──────────────────┘       └───────────────────┘       └──────────────────┘
 
   00_crear_dw.py ─────────────────────────────────────────────────────────────────────────────────┘
-                    (crea la base de datos y el esquema del DW)
+                    (crea la base de datos y el esquema del DW - ejecutar antes del Flujo 1)
+```
+
+### Flujo 2: Carga Incremental (ejecución periódica)
+
+```
+┌──────────────────────┐       ┌──────────────────┐       ┌───────────────────┐       ┌──────────────────────┐
+│                      │       │                  │       │                   │       │                      │
+│  Nuevos archivos     │──────▶│  01_staging_    │──────▶│  02_staging_     │──────▶│  04_carga_           │
+│  CSV (no procesados) │       │  area.py        │       │  clean.py         │       │  incremental.py      │
+│                      │       │                  │       │                   │       │                      │
+└──────────────────────┘       └──────────────────┘       └───────────────────┘       └──────────────────────┘
+                                       │                           │                           │
+                                       ▼                           ▼                           ▼
+                              ┌──────────────────┐       ┌───────────────────┐       ┌──────────────────────┐
+                              │ CentroMas_       │       │ CentroMas_        │       │ CentroMas_DW         │
+                              │ Staging          │       │ Staging_Clean     │       │ (actualizaciones     │
+                              │ (tablas crudas)  │       │ (datos limpios)   │       │  incrementales)      │
+                              └──────────────────┘       └───────────────────┘       └──────────────────────┘
 ```
 
 ---
 
-## Orden de Ejecución de los Scripts
+## Orden de Ejecución
 
-Los scripts deben ejecutarse en el siguiente orden **obligatorio** debido a las dependencias entre ellos:
+### Flujo de Carga Inicial (primera ejecución)
 
-| Orden | Script               | Descripción breve                              |
-|-------|----------------------|-----------------------------------------------|
-| 1     | `00_crear_dw.py`     | Crea la base de datos `CentroMas_DW` y sus tablas |
-| 2     | `01_staging_area.py` | Carga los archivos CSV en `CentroMas_Staging` |
-| 3     | `02_staging_clean.py`| Limpia y transforma los datos en `CentroMas_Staging_Clean` |
-| 4     | `03_carga_dw.py`     | Puebla el DW con los datos limpios            |
+| Orden | Script                          | Descripción breve                                          |
+|-------|---------------------------------|-----------------------------------------------------------|
+| 1     | `00_crear_dw.py`                | Crea la base de datos `CentroMas_DW` y sus tablas         |
+| 2     | `01_staging_area.py`            | Carga los archivos CSV originales en `CentroMas_Staging`  |
+| 3     | `02_staging_clean.py`           | Limpia y transforma los datos en `CentroMas_Staging_Clean`|
+| 4     | `03_carga_Inicial_dw.py`       | Puebla el DW con todos los datos limpios (carga inicial)  |
+
+### Flujo de Carga Incremental (ejecución periódica)
+
+| Orden | Script                          | Descripción breve                                          |
+|-------|---------------------------------|-----------------------------------------------------------|
+| 1     | `01_staging_area.py`            | Carga los nuevos archivos CSV (no procesados) en `CentroMas_Staging` |
+| 2     | `02_staging_clean.py`           | Limpia y transforma los nuevos datos en `CentroMas_Staging_Clean` |
+| 3     | `04_carga_incremental.py`       | Actualiza el DW con los nuevos datos (CDC y SCD Tipo 2)   |
 
 > **Nota:** Todos los scripts dependen de `db_conexion.py`. Al ejecutar cualquiera de ellos por primera vez, si no existe el archivo `db_config.json`, se iniciará automáticamente un asistente de configuración para establecer la conexión con SQL Server.
 
@@ -84,12 +133,13 @@ Los scripts deben ejecutarse en el siguiente orden **obligatorio** debido a las 
 **Particularidades:**
 - Es **idempotente**: puede ejecutarse múltiples veces sin generar errores (limpia y recrea el esquema).
 - No carga datos, solo define la estructura.
+- **Debe ejecutarse antes del primer uso del Flujo 1 (carga inicial).**
 
 ---
 
 ### 01_staging_area.py — Carga de Datos a Staging
 
-**Función principal:** Lee los archivos CSV fuente y los carga en tablas de staging dentro de la base de datos `CentroMas_Staging`.
+**Función principal:** Lee los archivos CSV fuente y los carga en tablas de staging dentro de la base de datos `CentroMas_Staging`. Los archivos procesados se mueven a una subcarpeta `procesados/` para no volver a cargarlos.
 
 **Bases de datos que utiliza:**
 - `master` (para crear/eliminar la base de staging)
@@ -98,16 +148,20 @@ Los scripts deben ejecutarse en el siguiente orden **obligatorio** debido a las 
 **Archivos CSV que carga:**
 - `categories.csv`, `customers.csv`, `employees.csv`, `order_details.csv`, `orders.csv`, `payment_methods.csv`, `products.csv`, `promotions.csv`, `stores.csv`, `suppliers.csv`
 
+> **Nota sobre el Flujo Incremental:** Si un archivo CSV no está presente en el lote del día (por ejemplo, no hay clientes nuevos), simplemente se omite sin generar errores. Esto permite cargar únicamente los datos nuevos.
+
 **Pasos internos:**
 
 1. **Configuración de ruta** — Solicita al usuario la ruta de la carpeta que contiene los archivos CSV. Si ya se configuró antes, permite reutilizar la ruta guardada en `db_config.json`.
 2. **Recreación de la base de datos** — Si `CentroMas_Staging` ya existe, la elimina y la recrea desde cero para garantizar una carga limpia (**idempotencia**).
 3. **Carga masiva** — Itera sobre cada archivo CSV, lo lee con `pandas.read_csv()` y lo inserta en una tabla con prefijo `stg_` (ej: `stg_products`, `stg_customers`) usando `to_sql()` con chunks de 5000 registros.
+4. **Archivado** — Los archivos procesados se mueven a la carpeta `procesados/` para evitar reprocesamiento.
 
 **Particularidades:**
 - No realiza transformaciones de datos (carga cruda).
 - Maneja errores por archivo (si un archivo falla, continúa con el siguiente).
 - Reporta cantidad de tablas creadas y registros insertados.
+- **Se utiliza tanto en el Flujo 1 (carga inicial) como en el Flujo 2 (carga incremental).**
 
 ---
 
@@ -147,12 +201,13 @@ Los scripts deben ejecutarse en el siguiente orden **obligatorio** debido a las 
 - Es el script más complejo del proceso.
 - Es totalmente **idempotente** (recrea la base de datos limpia cada vez).
 - Maneja la integridad referencial entre órdenes y clientes después de la deduplicación.
+- **Se utiliza tanto en el Flujo 1 como en el Flujo 2.**
 
 ---
 
-### 03_carga_dw.py — Carga Final del Data Warehouse
+### 03_carga_Inicial_dw.py — Carga Inicial del Data Warehouse
 
-**Función principal:** Puebla las tablas del Data Warehouse (`CentroMas_DW`) con los datos limpios provenientes de `CentroMas_Staging_Clean`.
+**Función principal:** Puebla las tablas del Data Warehouse (`CentroMas_DW`) con **todos** los datos limpios provenientes de `CentroMas_Staging_Clean` por primera vez.
 
 **Bases de datos que utiliza:**
 - `CentroMas_Staging_Clean` (origen de datos limpios)
@@ -162,9 +217,9 @@ Los scripts deben ejecutarse en el siguiente orden **obligatorio** debido a las 
 
 1. **Limpieza de tablas del DW (idempotencia)** — Vacía todas las tablas del DW y resetea los contadores `IDENTITY` de las dimensiones.
 2. **Carga de Dim_Tiempo** — Genera un calendario continuo desde la fecha de la orden más antigua hasta la más reciente. Calcula `sk_tiempo` como `YYYYMMDD`, `dia_nro`, `mes_nro`, `anio_nro` y `temporada` (Verano/Otoño/Invierno/Primavera).
-3. **Carga de Dim_Sucursal** — Inserta sucursales desde `clean_stores` con `es_actual = 1`.
-4. **Carga de Dim_Producto** — Inserta productos desde `clean_products` con `es_actual = 1`.
-5. **Carga de Dim_Cliente** — Calcula la edad a partir de la fecha de nacimiento y carga los clientes deduplicados.
+3. **Carga de Dim_Sucursal** — Inserta sucursales desde `clean_stores` con `es_actual = 1`, usando `opening_date` como `fecha_inicio`.
+4. **Carga de Dim_Producto** — Inserta productos desde `clean_products` con `es_actual = 1`, usando `fecha_carga` como `fecha_inicio`.
+5. **Carga de Dim_Cliente** — Calcula la edad a partir de la fecha de nacimiento y carga los clientes deduplicados, usando `registration_date` como `fecha_inicio`.
 6. **Carga de Fact_Venta (mapeo seguro de claves)** — Para cada detalle de orden, resuelve las claves sustitutas (*surrogate keys*) reales del DW mediante joins con las dimensiones:
    - `sk_sucursal` → lookup por `id_sucursal_bk`
    - `sk_producto` → lookup vía `sku` en `clean_products`
@@ -172,30 +227,85 @@ Los scripts deben ejecutarse en el siguiente orden **obligatorio** debido a las 
    - `sk_tiempo` → calculado desde la fecha de la orden
 
 **Particularidades:**
-- **Totalmente idempotente**: puede ejecutarse múltiples veces.
+- **Totalmente idempotente**: puede ejecutarse múltiples veces (limpia y recarga todo).
 - Utiliza **mapeo seguro** de claves sustitutas leyendo los IDs reales desde el DW (no asume valores).
-- Es compatible con **SCD Tipo 2** (dimensiones incluyen `fecha_inicio`, `fecha_fin`, `es_actual`) para futuras cargas incrementales.
+- Las dimensiones incluyen `fecha_inicio`, `fecha_fin`, `es_actual` para soportar **SCD Tipo 2** en cargas incrementales posteriores.
+- **Solo debe ejecutarse en el Flujo 1 (carga inicial). No debe ejecutarse en el Flujo 2.**
+
+---
+
+### 04_carga_incremental.py — Carga Incremental (CDC & SCD Tipo 2)
+
+**Función principal:** Actualiza el Data Warehouse `CentroMas_DW` con nuevos datos provenientes de `CentroMas_Staging_Clean`, aplicando técnicas de **Change Data Capture (CDC)** y **SCD Tipo 2** para mantener el historial de cambios en las dimensiones.
+
+**Bases de datos que utiliza:**
+- `CentroMas_Staging_Clean` (origen de datos limpios con nuevas transacciones)
+- `CentroMas_DW` (destino final, actualizado incrementalmente)
+
+**Pasos internos:**
+
+1. **Actualización de Dim_Tiempo** — Consulta la fecha máxima de `clean_orders` y la compara con el `sk_tiempo` máximo del DW. Si existen nuevos días, genera los registros de calendario faltantes y los inserta en `Dim_Tiempo`.
+
+2. **SCD2 en Dim_Sucursal** — Compara los datos actuales de sucursales en staging contra los registros activos (`es_actual = 1`) del DW. Si detecta cambios en atributos (`superficie_m2`, `ciudad_sucursal`, `provincia_sucursal`):
+   - **Cierra el historial anterior**: actualiza `es_actual = 0` y `fecha_fin` con la fecha de ejecución.
+   - **Abre nuevo historial**: inserta una nueva versión del registro con `fecha_inicio` = fecha de ejecución y `es_actual = 1`.
+   - **Registros inéditos**: las sucursales nuevas se insertan directamente con `es_actual = 1`.
+
+3. **SCD2 en Dim_Producto** — Similar a sucursales, compara atributos (`producto_nombre`, `marca_nombre`, `categoria_nombre`, `costo_unidad`, `precio_lista`) y aplica SCD Tipo 2 ante cualquier cambio.
+
+4. **SCD2 en Dim_Cliente** — Calcula la edad actual a partir de `birth_date` y compara atributos (`genero`, `edad`, `tipo_cliente`, `ciudad_cliente`, `provincia_cliente`). Aplica cierre/apertura de historial según corresponda.
+
+5. **Carga de hechos (High-Water Mark)** — Utiliza **High-Water Mark** basado en `nro_ticket` para identificar nuevos tickets de venta:
+   - Obtiene el último `nro_ticket` insertado en `Fact_Venta`.
+   - Extrae de `clean_orders` y `clean_order_details` solo los registros con `order_id > hwm_ticket`.
+   - Mapea cada registro a las claves sustitutas activas (`sk_sucursal`, `sk_producto`, `sk_cliente`, `sk_tiempo`) mediante joins con las dimensiones actualizadas.
+   - Inserta los nuevos registros en `Fact_Venta`.
+
+**Particularidades:**
+- **No es idempotente**: está diseñado para ejecutarse periódicamente y solo procesa datos nuevos.
+- Utiliza **SCD Tipo 2** para preservar el historial de cambios en las dimensiones.
+- Implementa **High-Water Mark** sobre `nro_ticket` para la tabla de hechos, evitando duplicados.
+- La función `actualizar_dimension()` centraliza la lógica de SCD2 (cierre + apertura) para las tres dimensiones.
+- Depende de que `03_carga_Inicial_dw.py` se haya ejecutado al menos una vez para establecer los datos base en el DW.
+- **Solo debe ejecutarse en el Flujo 2 (carga incremental).**
 
 ---
 
 ## Ejecución Completa (Paso a Paso)
 
+### Flujo 1: Carga Inicial (primera vez)
+
 ```bash
 # 1. Configurar la conexión (se ejecuta automáticamente si no existe db_config.json)
 #    O manualmente: python db_conexion.py
 
-# 2. Crear el Data Warehouse
+# 2. Crear el Data Warehouse (esquema físico)
 python 00_crear_dw.py
 
-# 3. Cargar datos crudos al staging (solicitará la ruta de los CSV)
+# 3. Cargar datos crudos al staging (solicitará la ruta de los CSV originales)
 python 01_staging_area.py
 
 # 4. Limpiar y transformar datos
 python 02_staging_clean.py
 
-# 5. Cargar el DW con datos limpios
-python 03_carga_dw.py
+# 5. Cargar el DW con todos los datos limpios
+python 03_carga_Inicial_dw.py
 ```
+
+### Flujo 2: Carga Incremental (ejecución periódica)
+
+```bash
+# 1. Cargar solo los nuevos archivos CSV (los que no se hayan procesado antes)
+python 01_staging_area.py
+
+# 2. Limpiar y transformar los nuevos datos
+python 02_staging_clean.py
+
+# 3. Actualizar el DW con los nuevos datos (CDC + SCD Tipo 2)
+python 04_carga_incremental.py
+```
+
+> **Nota importante:** El Flujo 2 (incremental) sustituye al paso 5 del Flujo 1. Una vez realizada la carga inicial, **no debe volver a ejecutarse `03_carga_Inicial_dw.py`**, ya que este reiniciaría por completo el DW. Para incorporar datos nuevos periódicamente, utilice siempre el Flujo 2.
 
 ---
 
