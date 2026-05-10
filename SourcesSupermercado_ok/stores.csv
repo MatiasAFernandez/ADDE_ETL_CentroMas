@@ -1,0 +1,9 @@
+store_id,store_name,city,province,region,store_type,surface_m2,opening_date
+1,Sucursal Resistencia Centro,Resistencia,Chaco,NEA,Express,650,2018-02-21
+2,Sucursal Corrientes Costanera,Corrientes,Corrientes,NEA,Express,1200,2019-05-17
+3,Sucursal Posadas Norte,Posadas,Misiones,NEA,Hipermercado,900,2022-02-17
+4,Sucursal Formosa Sur,Formosa,Formosa,NEA,Hipermercado,3200,2022-02-25
+5,Sucursal Santa Fe Centro,Santa Fe,Santa Fe,Centro,Express,650,2021-04-24
+6,Sucursal Rosario Oeste,Rosario,Santa Fe,Centro,Supermercado,650,2018-03-03
+7,Sucursal Córdoba Nueva Córdoba,Córdoba,Córdoba,Centro,Hipermercado,900,2019-04-22
+8,Sucursal Paraná Este,Paraná,Entre Ríos,Centro,Express,2500,2018-02-24

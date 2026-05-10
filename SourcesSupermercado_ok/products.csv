@@ -1,0 +1,32 @@
+product_id,sku,product_name,category_id,category_name,brand,supplier_id,unit,unit_cost,list_price,active_flag
+1,SKU-1001,Arroz 1kg,1,Almacén,Marolio,1,unidad,3331.81,4736.4,Y
+2,SKU-1002,Fideos Spaghetti 500g,1,Almacén,Lucchetti,2,unidad,3780.81,4245.07,Y
+3,SKU-1003,Harina 000 1kg,1,Almacén,Favorita,1,unidad,859.67,1316.67,Y
+4,SKU-1004,Yerba Mate 1kg,1,Almacén,Favorita,2,unidad,1651.78,2094.29,Y
+5,SKU-1005,Azúcar 1kg,1,Almacén,Favorita,1,unidad,4352.33,5583.04,Y
+6,SKU-1006,Aceite Girasol 1.5L,1,Almacén,Lucchetti,2,litro,3312.35,3775.1,Y
+7,SKU-1007,Gaseosa Cola 2.25L,2,Bebidas,Toro,4,litro,4595.19,5897.72,Y
+8,SKU-1008,Agua Mineral 2L,2,Bebidas,Arcor,4,litro,1424.09,2005.37,Y
+9,SKU-1009,Jugo Naranja 1L,2,Bebidas,Cepita,2,litro,1332.03,1756.64,Y
+10,SKU-1010,Cerveza Lager 1L,2,Bebidas,Cunnington,5,unidad,4122.89,5993.36,Y
+11,SKU-1011,Vino Tinto 750ml,2,Bebidas,Cepita,2,unidad,549.21,830.76,Y
+12,SKU-1012,Leche Entera 1L,3,Lácteos,Milkaut,3,unidad,3792.44,4995.81,Y
+13,SKU-1013,Yogur Bebible 1L,3,Lácteos,Milkaut,6,unidad,2845.37,4100.79,Y
+14,SKU-1014,Queso Cremoso Kg,3,Lácteos,Milkaut,6,kg,4026.87,4749.62,Y
+15,SKU-1015,Manteca 200g,3,Lácteos,Ilolay,6,unidad,1122.17,1334.03,Y
+16,SKU-1016,Carne Picada Kg,4,Carnes,Premium,9,kg,2556.92,3378.36,Y
+17,SKU-1017,Pechuga de Pollo Kg,4,Carnes,Premium,9,kg,856.4,1284.99,Y
+18,SKU-1018,Milanesas de Cerdo Kg,4,Carnes,Fresca,9,kg,1626.55,2139.08,Y
+19,SKU-1019,Banana Kg,5,Frutas y Verduras,Huerta Litoral,10,kg,4308.55,5766.15,Y
+20,SKU-1020,Manzana Roja Kg,5,Frutas y Verduras,Campo Vivo,10,kg,2829.28,3410.79,Y
+21,SKU-1021,Papa Kg,5,Frutas y Verduras,Campo Vivo,10,kg,2424.76,2832.37,Y
+22,SKU-1022,Tomate Kg,5,Frutas y Verduras,Huerta Litoral,10,kg,2919.02,4457.89,Y
+23,SKU-1023,Lavandina 1L,6,Limpieza,Skip,7,unidad,5043.99,6804.66,Y
+24,SKU-1024,Detergente 750ml,6,Limpieza,Magistral,7,unidad,1229.39,1655.87,Y
+25,SKU-1025,Jabón en Polvo 800g,6,Limpieza,Cif,8,unidad,2163.97,3048.66,Y
+26,SKU-1026,Shampoo 400ml,7,Perfumería,Dove,8,unidad,965.27,1221.43,Y
+27,SKU-1027,Pasta Dental 90g,7,Perfumería,Sedal,8,unidad,358.64,510.84,Y
+28,SKU-1028,Jabón de Tocador x3,7,Perfumería,Sedal,7,unidad,4668.59,5371.07,Y
+29,SKU-1029,Pizza Congelada,8,Congelados,Quickfood,2,unidad,713.99,1086.89,Y
+30,SKU-1030,Hamburguesas x4,8,Congelados,Paty,9,unidad,1912.44,2476.68,Y
+31,SKU-1031,Papas Fritas Congeladas 700g,8,Congelados,Paty,2,unidad,1820.84,2715.69,Y

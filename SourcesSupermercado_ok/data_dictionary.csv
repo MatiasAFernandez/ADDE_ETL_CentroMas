@@ -1,0 +1,11 @@
+file,primary_key,description
+stores.csv,store_id,Sucursales
+categories.csv,category_id,Categorías de productos
+suppliers.csv,supplier_id,Proveedores
+products.csv,product_id,Catálogo de productos
+customers.csv,customer_id,Clientes
+employees.csv,employee_id,Empleados por sucursal
+payment_methods.csv,payment_method_id,Medios de pago
+promotions.csv,promotion_id,Promociones
+orders.csv,order_id,Cabecera de ventas/tickets
+order_details.csv,order_detail_id,Detalle de líneas de venta
