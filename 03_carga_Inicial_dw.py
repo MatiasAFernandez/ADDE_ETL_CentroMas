@@ -23,7 +23,7 @@ def ejecutar_carga_dw():
         engine_dw = create_engine(dw_uri)
         
         print("\n==========================================")
-        print(" 🏗️ INICIANDO CARGA FINAL AL DW")
+        print(" 🏗️ COMENZANDO CARGA INICIAL AL DW")
         print("==========================================\n")
 
         # --- 0. IDEMPOTENCIA ---
@@ -61,7 +61,7 @@ def ejecutar_carga_dw():
 
         # --- 3. DIMENSIÓN PRODUCTO ---
         print("-> [3/5] Cargando Dim_Producto...")
-        df_stg_prod = pd.read_sql("SELECT sku as id_producto_bk, product_name as producto_nombre, brand as marca_nombre, category_name as categoria_nombre, unit_cost as costo_unidad, list_price as precio_lista, fecha_carga FROM clean_products", engine_clean)
+        df_stg_prod = pd.read_sql("SELECT sku as id_producto_bk, product_name as producto_nombre, brand as marca_nombre, category_name_x as categoria_nombre, unit_cost as costo_unidad, list_price as precio_lista, fecha_carga FROM clean_products", engine_clean)
         df_stg_prod['fecha_inicio'] = df_stg_prod['fecha_carga']
         df_stg_prod['fecha_fin'] = None
         df_stg_prod['es_actual'] = 1
@@ -76,6 +76,16 @@ def ejecutar_carga_dw():
         df_stg_cust['fecha_fin'] = None
         df_stg_cust['es_actual'] = 1
         df_stg_cust.drop(columns=['birth_date', 'registration_date']).to_sql('Dim_Cliente', engine_dw, if_exists='append', index=False)
+
+        # --- 4.5 PLANTAR SEMILLA (DICCIONARIOS DE TRADUCCIÓN) ---
+        print("-> [4.5/5] Plantando semilla: Generando diccionarios de traducción en Staging Clean...")
+        
+        df_dict_cli = pd.read_sql("SELECT customer_id, customer_code FROM clean_customers", engine_clean)
+        df_dict_cli.to_sql('dict_clientes', engine_clean, if_exists='replace', index=False)
+        
+        df_dict_prod = pd.read_sql("SELECT product_id, sku FROM clean_products", engine_clean)
+        df_dict_prod.to_sql('dict_productos', engine_clean, if_exists='replace', index=False)
+        print("    -> Diccionarios 'dict_clientes' y 'dict_productos' creados con éxito.")
 
         # --- 5. TABLA DE HECHOS (MAPEO 100% SEGURO) ---
         print("-> [5/5] Cargando Fact_Venta (Leyendo SKs reales del DW)...")
