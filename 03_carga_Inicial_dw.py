@@ -35,7 +35,26 @@ def ejecutar_carga_dw():
             conn.execute(text("DELETE FROM Dim_Sucursal; DBCC CHECKIDENT ('Dim_Sucursal', RESEED, 0)"))
             conn.execute(text("DELETE FROM Dim_Tiempo"))
             conn.commit()
-
+        # --- 0.5 REGISTROS DESCONOCIDOS (SK = -1) ---
+        print("[*] [INTEGRIDAD] Insertando registros 'Unknown' (SK = -1) en las dimensiones...")
+        with engine_dw.connect() as conn:
+            # Dim_Sucursal (-1)
+            conn.execute(text("SET IDENTITY_INSERT Dim_Sucursal ON"))
+            conn.execute(text("INSERT INTO Dim_Sucursal (sk_sucursal, id_sucursal_bk, superficie_m2, ciudad_sucursal, provincia_sucursal, fecha_inicio, es_actual) VALUES (-1, -1, 0, 'Desconocido', 'Desconocido', '1900-01-01', 1)"))
+            conn.execute(text("SET IDENTITY_INSERT Dim_Sucursal OFF"))
+            
+            # Dim_Producto (-1)
+            conn.execute(text("SET IDENTITY_INSERT Dim_Producto ON"))
+            conn.execute(text("INSERT INTO Dim_Producto (sk_producto, id_producto_bk, producto_nombre, marca_nombre, categoria_nombre, costo_unidad, precio_lista, fecha_inicio, es_actual) VALUES (-1, 'N/A', 'Desconocido', 'Desconocido', 'Desconocido', 0, 0, '1900-01-01', 1)"))
+            conn.execute(text("SET IDENTITY_INSERT Dim_Producto OFF"))
+            
+            # Dim_Cliente (-1)
+            conn.execute(text("SET IDENTITY_INSERT Dim_Cliente ON"))
+            conn.execute(text("INSERT INTO Dim_Cliente (sk_cliente, id_cliente_bk, genero, edad, tipo_cliente, ciudad_cliente, provincia_cliente, fecha_inicio, es_actual) VALUES (-1, 'N/A', 'No Informado', NULL, 'Desconocido', 'Desconocido', 'Desconocido', '1900-01-01', 1)"))
+            conn.execute(text("SET IDENTITY_INSERT Dim_Cliente OFF"))
+            
+            conn.commit()
+            
         # --- 1. DIMENSIÓN TIEMPO ---
         print("-> [1/5] Generando Dim_Tiempo...")
         df_orders_dates = pd.read_sql("SELECT MIN(order_date) as min_d, MAX(order_date) as max_d FROM clean_orders", engine_clean)
@@ -103,23 +122,25 @@ def ejecutar_carga_dw():
         # 5.1 MAPEO SUCURSALES
         # Traemos las claves reales de la base de datos
         map_suc = pd.read_sql("SELECT sk_sucursal, id_sucursal_bk FROM Dim_Sucursal WHERE es_actual = 1", engine_dw)
-        map_suc['id_sucursal_bk'] = map_suc['id_sucursal_bk'].astype(str) # Evitar errores de tipo
+        map_suc['id_sucursal_bk'] = map_suc['id_sucursal_bk'].astype(str)
         df_fact['store_id_str'] = df_fact['store_id'].astype(str)
-        df_fact = df_fact.merge(map_suc, left_on='store_id_str', right_on='id_sucursal_bk', how='inner').drop(columns=['id_sucursal_bk', 'store_id_str'])
+        df_fact = df_fact.merge(map_suc, left_on='store_id_str', right_on='id_sucursal_bk', how='left').drop(columns=['id_sucursal_bk', 'store_id_str'])
+        df_fact['sk_sucursal'] = df_fact['sk_sucursal'].fillna(-1).astype(int)
 
         # 5.2 MAPEO PRODUCTOS
         # Como los hechos usan 'product_id', necesitamos cruzarlo usando el SKU
         map_prod = pd.read_sql("SELECT sk_producto, id_producto_bk FROM Dim_Producto WHERE es_actual = 1", engine_dw)
         link_prod = pd.read_sql("SELECT product_id, sku FROM clean_products", engine_clean)
-        # Cruzamos el ID natural con el SKU, y el SKU con el SK
         map_prod_final = link_prod.merge(map_prod, left_on='sku', right_on='id_producto_bk')[['product_id', 'sk_producto']]
-        df_fact = df_fact.merge(map_prod_final, on='product_id', how='inner')
+        df_fact = df_fact.merge(map_prod_final, on='product_id', how='left')
+        df_fact['sk_producto'] = df_fact['sk_producto'].fillna(-1).astype(int)
 
         # 5.3 MAPEO CLIENTES
         map_cli = pd.read_sql("SELECT sk_cliente, id_cliente_bk FROM Dim_Cliente WHERE es_actual = 1", engine_dw)
         link_cli = pd.read_sql("SELECT customer_id, customer_code FROM clean_customers", engine_clean)
         map_cli_final = link_cli.merge(map_cli, left_on='customer_code', right_on='id_cliente_bk')[['customer_id', 'sk_cliente']]
-        df_fact = df_fact.merge(map_cli_final, on='customer_id', how='inner')
+        df_fact = df_fact.merge(map_cli_final, on='customer_id', how='left')
+        df_fact['sk_cliente'] = df_fact['sk_cliente'].fillna(-1).astype(int)
 
         # 5.4 CARGA FINAL
         cols_fact = ['sk_tiempo', 'sk_cliente', 'sk_producto', 'sk_sucursal', 'nro_ticket', 
