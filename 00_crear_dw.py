@@ -106,6 +106,19 @@ def build_data_warehouse(dw_uri):
                CONSTRAINT FK_Fact_Venta_Producto  FOREIGN KEY (sk_producto)  REFERENCES dbo.Dim_Producto(sk_producto),
                CONSTRAINT FK_Fact_Venta_Sucursal  FOREIGN KEY (sk_sucursal)  REFERENCES dbo.Dim_Sucursal(sk_sucursal)
             );
+        """,
+        "8. Creación ETL_Logs (Auditoría)": """
+            IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ETL_Logs]') AND type in (N'U'))
+            BEGIN
+                CREATE TABLE dbo.ETL_Logs (
+                    id_log              INT IDENTITY(1,1) PRIMARY KEY,
+                    fecha_carga         DATETIME        DEFAULT GETDATE(),
+                    script_nombre       VARCHAR(100)    NOT NULL,
+                    estado              VARCHAR(20)     NOT NULL,
+                    filas_procesadas    INT             NOT NULL,
+                    mensaje             VARCHAR(MAX)    NULL
+                );
+            END
         """
     }
 

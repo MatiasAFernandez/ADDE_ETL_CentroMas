@@ -7,6 +7,15 @@ DW_DB_NAME = 'CentroMas_DW'
 CLEAN_DB_NAME = 'CentroMas_Staging_Clean'
 
 def ejecutar_carga_incremental():
+    # ==========================================
+    # INICIALIZACIÓN DE VARIABLES DE AUDITORÍA
+    # ==========================================
+    script_name = '04_carga_incremental.py'
+    estado_etl = 'EN EJECUCION'
+    filas_totales = 0
+    mensaje_etl = ''
+    engine_dw = None # Inicializamos afuera para que el 'finally' lo pueda usar
+
     try:
         master_uri, _, _ = obtener_uris()
         engine_dw = create_engine(master_uri.replace('master', DW_DB_NAME))
@@ -166,6 +175,7 @@ def ejecutar_carga_incremental():
                             VALUES (:bk, :sup, :ciu, :prov, :fi, 1)
                         """), {"bk": int(row['store_id']), "sup": row['surface_m2'], "ciu": row['city'], "prov": row['province'], "fi": row['opening_date']})
                     conn.commit()
+                    
         # ==========================================
         # PASO 4: DICCIONARIOS DE TRADUCCIÓN (ID a CÓDIGO)
         # Guardamos la relación inmutable de IDs origen hacia Business Keys (BK).
@@ -275,11 +285,53 @@ def ejecutar_carga_incremental():
             print(f"[*] Insertando {len(df_fact_final)} filas en Fact_Venta...")
             df_fact_final.to_sql('Fact_Venta', engine_dw, if_exists='append', index=False, method='multi', dtype={'precio_unitario': types.Numeric(12,2), 'monto_bruto': types.Numeric(12,2), 'monto_neto': types.Numeric(12,2), 'cantidad_vendida': types.Numeric(10,2), 'descuento_aplicado': types.Numeric(12,2)})
             print(f"-> Se procesaron ventas hasta el ticket: {df_orders_delta['order_id'].max()}")
+            
+            # --- ACTUALIZAMOS AUDITORÍA (CASO CON VENTAS) ---
+            estado_etl = 'EXITO'
+            filas_totales = len(df_fact_final)
+            mensaje_etl = "Carga incremental finalizada correctamente."
 
-        print("\n[ÉXITO] Carga Incremental Finalizada Correctamente.")
+        else:
+            # --- ACTUALIZAMOS AUDITORÍA (CASO SIN VENTAS) ---
+            estado_etl = 'EXITO'
+            filas_totales = 0
+            mensaje_etl = "Carga finalizada. No se detectaron ventas nuevas en el delta."
+
+        print(f"\n[{estado_etl}] {mensaje_etl}")
 
     except Exception as e:
+        # ==========================================
+        # CAPTURA DE ERRORES PARA AUDITORÍA
+        # ==========================================
+        estado_etl = 'ERROR'
+        filas_totales = 0
+        mensaje_etl = f"Fallo en la ejecución: {str(e)[:4000]}"
         print(f"\n[ERROR EN INCREMENTAL] {e}")
+        raise e  # Levantamos el error para que falle a nivel consola
+
+    finally:
+        # ==========================================
+        # REGISTRO FINAL EN TABLA ETL_Logs
+        # ==========================================
+        if engine_dw is not None:
+            try:
+                print("\n-> Escribiendo registro en la tabla de Logs...")
+                query_log = text("""
+                    INSERT INTO ETL_Logs (script_nombre, estado, filas_procesadas, mensaje)
+                    VALUES (:script, :estado, :filas, :msg)
+                """)
+                with engine_dw.begin() as conn:
+                    conn.execute(query_log, {
+                        "script": script_name,
+                        "estado": estado_etl,
+                        "filas": filas_totales,
+                        "msg": mensaje_etl
+                    })
+                print("[OK] Log guardado exitosamente en la base de datos.")
+            except Exception as log_e:
+                print(f"[!] Error crítico al escribir en la tabla ETL_Logs: {log_e}")
+        else:
+            print("[!] No se pudo registrar el log porque no se estableció conexión con el DW.")
 
 if __name__ == "__main__":
     ejecutar_carga_incremental()
