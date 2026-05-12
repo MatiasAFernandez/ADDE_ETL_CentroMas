@@ -13,7 +13,7 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 - **Python 3** como lenguaje de automatización del proceso ETL
 - **Microsoft SQL Server** como motor de base de datos
 - **pandas** para transformación y manipulación de datos
-- **SQLAlchemy + pyodbc** como puente de conexión entre Python y SQL Server
+- **SQLAlchemy + pymssql** como puente de conexión entre Python y SQL Server
 - **Driver ODBC 18 para SQL Server**
 
 **Se recomienda crear un entorno virtual para instalar las librerías necesarias:**
@@ -35,7 +35,7 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 
 3. Instalar las librerías requeridas:
    ```bash
-   pip install pandas sqlalchemy pyodbc
+   pip install pandas sqlalchemy pymssql
    ```
 
 ---
