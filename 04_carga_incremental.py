@@ -77,6 +77,7 @@ def ejecutar_carga_incremental():
                     conn.commit()
         # --- 3.2 SCD TIPO 2: PRODUCTOS ---
         stg_prod = pd.read_sql("SELECT * FROM clean_products", engine_clean)
+        
         if not stg_prod.empty:
             print("    -> Verificando Productos (SCD2 y Nuevos)...")
             for _, row in stg_prod.iterrows():
@@ -88,29 +89,46 @@ def ejecutar_carga_incremental():
                 with engine_dw.connect() as conn:
                     current_dw_prod = conn.execute(query_check_prod, {"bk": row['sku']}).fetchone()
                     
-                    # CASO A: El producto ya existe (Verificamos si hay cambios para SCD2)
                     if current_dw_prod:
-                        if (current_dw_prod.costo_unidad != row['unit_cost'] or 
-                            current_dw_prod.precio_lista != row['list_price'] or 
-                            current_dw_prod.categoria_nombre != row['category_name']):
-                            
+                        # 1. Normalización: Convertimos todo a float para comparar manzanas con manzanas
+                        # Usamos 'or 0' por si algún campo viene NULL de la base
+                        costo_dw = float(current_dw_prod.costo_unidad or 0)
+                        costo_stg = float(row['unit_cost'] or 0)
+                        precio_dw = float(current_dw_prod.precio_lista or 0)
+                        precio_stg = float(row['list_price'] or 0)
+                        
+                        # 2. Limpieza de strings para evitar fallos por espacios invisibles
+                        cat_dw = str(current_dw_prod.categoria_nombre or "").strip()
+                        cat_stg = str(row['category_name_y'] or "").strip()
+
+                        # 3. Comparación robusta: ¿La diferencia es mayor a 1 centavo?
+                        hubo_cambio = (
+                            abs(costo_dw - costo_stg) > 0.01 or 
+                            abs(precio_dw - precio_stg) > 0.01 or 
+                            cat_dw != cat_stg
+                        )
+
+                        if hubo_cambio:
+                            # Cerramos versión vieja
                             conn.execute(text("UPDATE Dim_Producto SET fecha_fin = :fecha, es_actual = 0 WHERE sk_producto = :sk"), 
                                          {"fecha": fecha_ejecucion.date(), "sk": current_dw_prod.sk_producto})
                             
+                            # Insertamos versión nueva
                             conn.execute(text("""
                                 INSERT INTO Dim_Producto (id_producto_bk, producto_nombre, marca_nombre, categoria_nombre, costo_unidad, precio_lista, fecha_inicio, es_actual)
                                 VALUES (:bk, :nom, :marca, :cat, :costo, :precio, :fi, 1)
-                            """), {"bk": row['sku'], "nom": row['product_name'], "marca": row['brand'], "cat": row['category_name'], 
+                            """), {"bk": row['sku'], "nom": row['product_name'], "marca": row['brand'], "cat": cat_stg, 
                                    "costo": row['unit_cost'], "precio": row['list_price'], "fi": fecha_ejecucion.date()})
+                            conn.commit()
                     
-                    # CASO B: El producto es totalmente nuevo (Insertamos primera versión)
                     else:
+                        # CASO B: Producto totalmente nuevo (Insert puro)
                         conn.execute(text("""
                             INSERT INTO Dim_Producto (id_producto_bk, producto_nombre, marca_nombre, categoria_nombre, costo_unidad, precio_lista, fecha_inicio, es_actual)
                             VALUES (:bk, :nom, :marca, :cat, :costo, :precio, :fi, 1)
-                        """), {"bk": row['sku'], "nom": row['product_name'], "marca": row['brand'], "cat": row['category_name'], 
+                        """), {"bk": row['sku'], "nom": row['product_name'], "marca": row['brand'], "cat": str(row['category_name_y']).strip(), 
                                "costo": row['unit_cost'], "precio": row['list_price'], "fi": fecha_ejecucion.date()})
-                    conn.commit()
+                        conn.commit()
                     
         # --- 3.3 SCD TIPO 2 Y NUEVOS: SUCURSALES ---
         stg_stores = pd.read_sql("SELECT * FROM clean_stores", engine_clean)
@@ -170,23 +188,21 @@ def ejecutar_carga_incremental():
             dict_prod.to_sql('dict_productos', engine_clean, if_exists='replace', index=False)
 
         # ==========================================
-        # PASO 5: BÚSQUEDA DIRECTA EN DATA WAREHOUSE Y CARGA
+        # PASO 5: BÚSQUEDA DIRECTA EN DATA WAREHOUSE Y CARGA (AS-WAS JOIN)
         # ==========================================
         if hay_ventas:
-            print("-> [FACT] Cruzando ventas con dimensiones activas del DW...")
+            print("-> [FACT] Cruzando ventas con el historial del DW (Cruce Temporal)...")
             
             df_fact = df_details_delta.merge(df_orders_delta, on='order_id', suffixes=('_det', '_ord'))
-            df_fact['sk_tiempo'] = pd.to_datetime(df_fact['order_date']).dt.strftime('%Y%m%d').astype(int)
+            df_fact['order_date'] = pd.to_datetime(df_fact['order_date'])
+            df_fact['sk_tiempo'] = df_fact['order_date'].dt.strftime('%Y%m%d').astype(int)
             
-            # --- NUEVO: MANTENIMIENTO DINÁMICO DE DIM_TIEMPO ---
+            # --- MANTENIMIENTO DINÁMICO DE DIM_TIEMPO ---
             fechas_unicas = df_fact['sk_tiempo'].unique()
             fechas_str = ",".join(map(str, fechas_unicas))
             
-            # Consultamos qué fechas ya existen en el DW
             existentes = pd.read_sql(f"SELECT sk_tiempo FROM Dim_Tiempo WHERE sk_tiempo IN ({fechas_str})", engine_dw)
             fechas_existentes = existentes['sk_tiempo'].tolist()
-            
-            # Filtramos las que faltan
             fechas_faltantes = [sk for sk in fechas_unicas if sk not in fechas_existentes]
             
             if fechas_faltantes:
@@ -207,26 +223,53 @@ def ejecutar_carga_incremental():
                 df_tiempo_nuevo.to_sql('Dim_Tiempo', engine_dw, if_exists='append', index=False)
             # ---------------------------------------------------
 
-            # A) Traducir el idioma del Origen al idioma del DW usando nuestros diccionarios
-            df_fact = df_fact.merge(dict_cli, on='customer_id', how='inner')
-            df_fact = df_fact.merge(dict_prod, on='product_id', how='inner')
-            df_fact['id_sucursal_bk'] = df_fact['store_id'] # Sucursal usa ID directo como BK
-            
-            # B) Buscar los Surrogate Keys DIRECTO en el DW (Solo las versiones actuales)
-            dim_cli = pd.read_sql("SELECT sk_cliente, id_cliente_bk as customer_code FROM Dim_Cliente WHERE es_actual = 1", engine_dw)
-            dim_prod = pd.read_sql("SELECT sk_producto, id_producto_bk as sku FROM Dim_Producto WHERE es_actual = 1", engine_dw)
-            dim_suc = pd.read_sql("SELECT sk_sucursal, id_sucursal_bk FROM Dim_Sucursal WHERE es_actual = 1", engine_dw)
-            
-            # C) Asignar los SK a las ventas
-            df_fact = df_fact.merge(dim_cli, on='customer_code', how='inner')
-            df_fact = df_fact.merge(dim_prod, on='sku', how='inner')
-            df_fact = df_fact.merge(dim_suc, on='id_sucursal_bk', how='inner')
+            # A) Traducir el idioma del Origen al idioma del DW usando nuestros diccionarios (con LEFT JOIN por seguridad)
+            df_fact = df_fact.merge(dict_cli, on='customer_id', how='left')
+            df_fact = df_fact.merge(dict_prod, on='product_id', how='left')
+            df_fact['id_sucursal_bk'] = df_fact['store_id'] 
 
-            # Renombrar y calcular métricas
+            # B) Traer TODO el historial de las dimensiones (Reemplazando NULL por Fecha Infinita)
+            dim_cli = pd.read_sql("SELECT sk_cliente, id_cliente_bk as customer_code, fecha_inicio, ISNULL(fecha_fin, '9999-12-31') as fecha_fin FROM Dim_Cliente", engine_dw)
+            dim_prod = pd.read_sql("SELECT sk_producto, id_producto_bk as sku, fecha_inicio, ISNULL(fecha_fin, '9999-12-31') as fecha_fin FROM Dim_Producto", engine_dw)
+            dim_suc = pd.read_sql("SELECT sk_sucursal, CAST(id_sucursal_bk AS VARCHAR) as id_sucursal_bk, fecha_inicio, ISNULL(fecha_fin, '9999-12-31') as fecha_fin FROM Dim_Sucursal", engine_dw)
+            
+            # Asegurar compatibilidad de tipos
+            df_fact['id_sucursal_bk'] = df_fact['id_sucursal_bk'].astype(str)
+            for d in [dim_cli, dim_prod, dim_suc]:
+                d['fecha_inicio'] = pd.to_datetime(d['fecha_inicio'])
+                d['fecha_fin'] = pd.to_datetime(d['fecha_fin'])
+
+            # C) Función robusta para Cruce Temporal
+            def aplicar_join_temporal(df_ventas, dim_df, bk_col, sk_col):
+                # 1. Asignar ID único a cada fila de venta para no perder el rastro
+                df_ventas['temp_row_id'] = range(len(df_ventas))
+
+                # 2. Cruce inicial por Business Key (generará duplicados si la dimensión tiene historia)
+                merged = df_ventas.merge(dim_df, on=bk_col, how='left')
+
+                # 3. Filtrar para quedarse SOLO con la versión vigente en el momento de la venta
+                mask_fecha = (merged['order_date'] >= merged['fecha_inicio']) & (merged['order_date'] <= merged['fecha_fin'])
+                validos = merged[mask_fecha].copy()
+
+                # 4. Atrapar ventas que NO encontraron coincidencia (fuera de fecha o ID inexistente)
+                id_validos = validos['temp_row_id'].unique()
+                huerfanas = df_ventas[~df_ventas['temp_row_id'].isin(id_validos)].copy()
+                huerfanas[sk_col] = -1 # Clave del registro "Unknown"
+
+                # 5. Unir los resultados y limpiar columnas auxiliares
+                resultado = pd.concat([validos.drop(columns=['fecha_inicio', 'fecha_fin']), huerfanas], ignore_index=True)
+                return resultado.drop(columns=['temp_row_id'])
+
+            # D) Aplicar la función a las 3 dimensiones
+            df_fact = aplicar_join_temporal(df_fact, dim_cli, 'customer_code', 'sk_cliente')
+            df_fact = aplicar_join_temporal(df_fact, dim_prod, 'sku', 'sk_producto')
+            df_fact = aplicar_join_temporal(df_fact, dim_suc, 'id_sucursal_bk', 'sk_sucursal')
+
+            # E) Renombrar, calcular métricas y Guardar
             df_fact = df_fact.rename(columns={'order_id': 'nro_ticket', 'unit_price': 'precio_unitario', 'net_amount_det': 'monto_neto', 'quantity': 'cantidad_vendida', 'discount_amount': 'descuento_aplicado'})
             df_fact['monto_bruto'] = df_fact['cantidad_vendida'] * df_fact['precio_unitario']
-            cols_fact = ['sk_tiempo', 'sk_cliente', 'sk_producto', 'sk_sucursal', 'nro_ticket', 'cantidad_vendida', 'precio_unitario', 'monto_bruto', 'descuento_aplicado', 'monto_neto']
             
+            cols_fact = ['sk_tiempo', 'sk_cliente', 'sk_producto', 'sk_sucursal', 'nro_ticket', 'cantidad_vendida', 'precio_unitario', 'monto_bruto', 'descuento_aplicado', 'monto_neto']
             df_fact_final = df_fact[cols_fact]
 
             print(f"[*] Insertando {len(df_fact_final)} filas en Fact_Venta...")
