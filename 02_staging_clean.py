@@ -23,7 +23,7 @@ def asegurar_idempotencia(master_uri):
         
     # 2. Limpiar SOLO las tablas de carga (no los lookups)
     engine_clean = create_engine(master_uri.replace('master', CLEAN_DB_NAME))
-    tablas_a_limpiar = ['clean_products', 'clean_customers', 'clean_stores', 'clean_orders', 'clean_order_details']
+    tablas_a_limpiar = ['clean_products', 'clean_customers', 'clean_stores', 'clean_orders', 'clean_order_details', 'rejected_records']
     
     with engine_clean.connect() as conn:
         for tabla in tablas_a_limpiar:
@@ -219,16 +219,26 @@ def ejecutar_staging_clean():
 
         inicializar_lookups(engine_clean)
         fecha_ejecucion = datetime.now()
+        
+        # DataFrame para almacenar registros rechazados globalmente
+        df_rechazados_global = pd.DataFrame(columns=['table_name', 'error_reason', 'raw_data', 'rejection_time'])
 
         # --- 1. PRODUCTOS ---
         print("\n-> [1/5] Procesando Productos...")
         if 'stg_products' in stg_tables:
             df_prod = pd.read_sql("SELECT * FROM stg_products", engine_stg)
             
-            # El category_name ya viene incluido en products.csv, no necesita merge con categories
-            if 'category_name' not in df_prod.columns:
-                print("    [!] 'category_name' no encontrado en products. Se asigna 'Sin Categoría'.")
+            # Cruce dinámico: Solo si stg_categories también vino en el incremento
+            if 'stg_categories' in stg_tables and 'category_name' not in df_prod.columns:
+                df_cat = pd.read_sql("SELECT category_id, category_name FROM stg_categories", engine_stg)
+                df_prod = df_prod.merge(df_cat, on='category_id', how='left')
+            elif 'category_name' not in df_prod.columns:
+                print("    [!] 'stg_categories' no recibida y 'category_name' no existe en productos. Se asigna 'Sin Categoría'.")
                 df_prod['category_name'] = 'Sin Categoría'
+
+            # Asegurar que no quede nulo
+            if 'category_name' in df_prod.columns:
+                df_prod['category_name'] = df_prod['category_name'].fillna('Sin Categoría')
 
             df_prod['active_flag'] = df_prod['active_flag'].map({'Y': 1, 'N': 0}).fillna(0)
             df_prod['fecha_carga'] = fecha_ejecucion
@@ -322,6 +332,28 @@ def ejecutar_staging_clean():
         if 'stg_order_details' in stg_tables:
             df_det = pd.read_sql("SELECT * FROM stg_order_details", engine_stg)
             
+            # Ejercicio de Rechazos: Unidades menores a 0
+            df_det['quantity'] = pd.to_numeric(df_det['quantity'], errors='coerce')
+            mask_error = (df_det['quantity'] <= 0) | (df_det['quantity'].isnull())
+            
+            if mask_error.any():
+                df_det_error = df_det[mask_error].copy()
+                rechazos = pd.DataFrame({
+                    'table_name': 'stg_order_details',
+                    'error_reason': 'Cantidad no puede ser menor o igual a 0, o nula',
+                    'raw_data': df_det_error.to_json(orient='records', lines=True).splitlines(),
+                    'rejection_time': fecha_ejecucion
+                })
+                # Evitar usar concat sobre el global vacio con tipo inferido de object (Warning de pandas)
+                if df_rechazados_global.empty:
+                    df_rechazados_global = rechazos
+                else:
+                    df_rechazados_global = pd.concat([df_rechazados_global, rechazos], ignore_index=True)
+                
+                print(f"    [!] Se detectaron {len(df_det_error)} registros inválidos en stg_order_details. Enviados a 'rejected_records'.")
+                # Removemos los registros malos del dataframe principal
+                df_det = df_det[~mask_error].copy()
+
             # Regla de unidades: requiere stg_products
             if 'stg_products' in stg_tables:
                 df_p = pd.read_sql("SELECT product_id, unit FROM stg_products", engine_stg)
@@ -338,6 +370,14 @@ def ejecutar_staging_clean():
             df_det = pd.DataFrame(columns=['order_id', 'product_id', 'quantity', 'unit_price', 'discount_amount', 'net_amount', 'fecha_carga'])
         
         df_det.to_sql('clean_order_details', engine_clean, if_exists='replace', index=False, dtype={'quantity': types.Numeric(10,2), 'unit_price': types.Numeric(12,2), 'discount_amount': types.Numeric(12,2), 'net_amount': types.Numeric(12,2), 'fecha_carga': types.DateTime})
+
+        # --- 6. GUARDAR RECHAZOS ---
+        print("\n-> [6/6] Guardando Registros Rechazados...")
+        if not df_rechazados_global.empty:
+            df_rechazados_global.to_sql('rejected_records', engine_clean, if_exists='append', index=False, dtype={'rejection_time': types.DateTime})
+            print(f"    [+] {len(df_rechazados_global)} registros guardados en la tabla 'rejected_records'.")
+        else:
+            print("    [-] No hubo registros rechazados.")
 
         print("\n[ÉXITO] Limpieza de Datos Finalizada.")
 
