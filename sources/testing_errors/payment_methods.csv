@@ -1,0 +1,5 @@
+payment_method_id,payment_method_name
+1,Efectivo
+2,Tarjeta Débito
+3,Tarjeta Crédito
+4,Billetera Virtual

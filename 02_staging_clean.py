@@ -242,6 +242,34 @@ def ejecutar_staging_clean():
 
             df_prod['active_flag'] = df_prod['active_flag'].map({'Y': 1, 'N': 0}).fillna(0)
             df_prod['fecha_carga'] = fecha_ejecucion
+            
+            # --- VALIDACIONES DE DATA QUALITY PARA PRODUCTOS ---
+            df_prod['unit_cost'] = pd.to_numeric(df_prod['unit_cost'], errors='coerce')
+            df_prod['list_price'] = pd.to_numeric(df_prod['list_price'], errors='coerce')
+            
+            m_cost = (df_prod['unit_cost'] < 0) | (df_prod['unit_cost'].isnull())
+            m_price = (df_prod['list_price'] < 0) | (df_prod['list_price'].isnull())
+            
+            mask_err_prod = m_cost | m_price
+            if mask_err_prod.any():
+                df_err_prod = df_prod[mask_err_prod].copy()
+                def get_err_prod(r):
+                    res = []
+                    if pd.isnull(r['unit_cost']) or r['unit_cost'] < 0: res.append("Costo<0/Nulo")
+                    if pd.isnull(r['list_price']) or r['list_price'] < 0: res.append("Precio<0/Nulo")
+                    return " | ".join(res)
+                
+                df_err_prod['error_reason'] = df_err_prod.apply(get_err_prod, axis=1)
+                rechazos = pd.DataFrame({
+                    'table_name': 'stg_products',
+                    'error_reason': df_err_prod['error_reason'].values,
+                    'raw_data': df_err_prod.drop(columns=['error_reason']).to_json(orient='records', lines=True, date_format='iso').splitlines(),
+                    'rejection_time': fecha_ejecucion
+                })
+                df_rechazados_global = rechazos if df_rechazados_global.empty else pd.concat([df_rechazados_global, rechazos], ignore_index=True)
+                print(f"    [!] Se detectaron {len(df_err_prod)} registros inválidos en stg_products. Enviados a 'rejected_records'.")
+                df_prod = df_prod[~mask_err_prod].copy()
+                
         else:
             print("    [-] No hay productos nuevos. Generando estructura vacía.")
             df_prod = pd.DataFrame(columns=['product_id', 'sku', 'product_name', 'brand', 'unit', 'unit_cost', 'list_price', 'active_flag', 'category_name', 'fecha_carga'])
@@ -254,6 +282,23 @@ def ejecutar_staging_clean():
             df_stores = pd.read_sql("SELECT store_id, surface_m2, city, province, opening_date FROM stg_stores", engine_stg)
             df_stores['opening_date'] = pd.to_datetime(df_stores['opening_date'])
             df_stores['fecha_carga'] = fecha_ejecucion
+            
+            # --- VALIDACIONES DE DATA QUALITY PARA SUCURSALES ---
+            df_stores['surface_m2'] = pd.to_numeric(df_stores['surface_m2'], errors='coerce')
+            mask_err_sto = (df_stores['surface_m2'] <= 0) | (df_stores['surface_m2'].isnull())
+            
+            if mask_err_sto.any():
+                df_err_sto = df_stores[mask_err_sto].copy()
+                rechazos = pd.DataFrame({
+                    'table_name': 'stg_stores',
+                    'error_reason': 'Superficie<=0/Nula',
+                    'raw_data': df_err_sto.to_json(orient='records', lines=True, date_format='iso').splitlines(),
+                    'rejection_time': fecha_ejecucion
+                })
+                df_rechazados_global = rechazos if df_rechazados_global.empty else pd.concat([df_rechazados_global, rechazos], ignore_index=True)
+                print(f"    [!] Se detectaron {len(df_err_sto)} registros inválidos en stg_stores. Enviados a 'rejected_records'.")
+                df_stores = df_stores[~mask_err_sto].copy()
+                
         else:
             print("    [-] No hay sucursales nuevas. Generando estructura vacía.")
             df_stores = pd.DataFrame(columns=['store_id', 'surface_m2', 'city', 'province', 'opening_date', 'fecha_carga'])
@@ -316,6 +361,23 @@ def ejecutar_staging_clean():
                 df_cust_clean = df_cust_clean.drop(columns=['fecha_min_compra'])
             
             df_orders['fecha_carga'] = fecha_ejecucion
+            
+            # --- VALIDACIONES DE DATA QUALITY PARA VENTAS ---
+            df_orders['net_amount'] = pd.to_numeric(df_orders['net_amount'], errors='coerce')
+            mask_err_ord = (df_orders['net_amount'] < 0) | (df_orders['net_amount'].isnull())
+            
+            if mask_err_ord.any():
+                df_err_ord = df_orders[mask_err_ord].copy()
+                rechazos = pd.DataFrame({
+                    'table_name': 'stg_orders',
+                    'error_reason': 'Monto Neto<0/Nulo',
+                    'raw_data': df_err_ord.to_json(orient='records', lines=True, date_format='iso').splitlines(),
+                    'rejection_time': fecha_ejecucion
+                })
+                df_rechazados_global = rechazos if df_rechazados_global.empty else pd.concat([df_rechazados_global, rechazos], ignore_index=True)
+                print(f"    [!] Se detectaron {len(df_err_ord)} registros inválidos en stg_orders. Enviados a 'rejected_records'.")
+                df_orders = df_orders[~mask_err_ord].copy()
+                
         else:
             print("    [-] No hay ventas nuevas. Generando estructura vacía.")
             df_orders = pd.DataFrame(columns=['order_id', 'order_date', 'customer_id', 'store_id', 'net_amount', 'fecha_carga'])
@@ -332,16 +394,39 @@ def ejecutar_staging_clean():
         if 'stg_order_details' in stg_tables:
             df_det = pd.read_sql("SELECT * FROM stg_order_details", engine_stg)
             
-            # Ejercicio de Rechazos: Unidades menores a 0
+            # Casteo estricto de tipos de datos
             df_det['quantity'] = pd.to_numeric(df_det['quantity'], errors='coerce')
-            mask_error = (df_det['quantity'] <= 0) | (df_det['quantity'].isnull())
+            df_det['unit_price'] = pd.to_numeric(df_det['unit_price'], errors='coerce')
+            df_det['discount_pct'] = pd.to_numeric(df_det['discount_pct'], errors='coerce')
+            df_det['net_amount'] = pd.to_numeric(df_det['net_amount'], errors='coerce')
+            
+            # Máscaras de validación (Negativos, nulos, o formato incorrecto)
+            m_qty = (df_det['quantity'] <= 0) | (df_det['quantity'].isnull())
+            m_price = (df_det['unit_price'] < 0) | (df_det['unit_price'].isnull())
+            # Descuento: numérico y >= 0 (se remueve la restricción estricta de entero)
+            m_disc = (df_det['discount_pct'] < 0) | (df_det['discount_pct'].isnull())
+            m_net = (df_det['net_amount'] < 0) | (df_det['net_amount'].isnull())
+            
+            mask_error = m_qty | m_price | m_disc | m_net
             
             if mask_error.any():
                 df_det_error = df_det[mask_error].copy()
+                
+                # Función para trackear exactamente qué falló en cada fila
+                def get_error_reason(row):
+                    r = []
+                    if pd.isnull(row['quantity']) or row['quantity'] <= 0: r.append("Cantidad<=0")
+                    if pd.isnull(row['unit_price']) or row['unit_price'] < 0: r.append("Precio<0")
+                    if pd.isnull(row['discount_pct']) or row['discount_pct'] < 0: r.append("Descuento<0")
+                    if pd.isnull(row['net_amount']) or row['net_amount'] < 0: r.append("Neto<0")
+                    return " | ".join(r)
+
+                df_det_error['error_reason'] = df_det_error.apply(get_error_reason, axis=1)
+
                 rechazos = pd.DataFrame({
                     'table_name': 'stg_order_details',
-                    'error_reason': 'Cantidad no puede ser menor o igual a 0, o nula',
-                    'raw_data': df_det_error.to_json(orient='records', lines=True).splitlines(),
+                    'error_reason': df_det_error['error_reason'].values,
+                    'raw_data': df_det_error.drop(columns=['error_reason']).to_json(orient='records', lines=True, date_format='iso').splitlines(),
                     'rejection_time': fecha_ejecucion
                 })
                 # Evitar usar concat sobre el global vacio con tipo inferido de object (Warning de pandas)

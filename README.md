@@ -196,7 +196,17 @@ El proyecto contempla **dos flujos de ejecución** bien diferenciados:
 - `CentroMas_Staging` (origen de datos crudos)
 - `CentroMas_Staging_Clean` (destino de datos limpios)
 
-**Reglas de calidad de datos aplicadas:**
+**Reglas de auditoría y calidad de datos aplicadas (Data Quality & Cuarentena):**
+
+| Archivo            | Regla de Validación Estricta                                  | Acción ante Dato Inválido / Anomalía                                 |
+|--------------------|---------------------------------------------------------------|----------------------------------------------------------------------|
+| `products`         | `unit_cost` y `list_price` deben ser reales >= 0              | Se rechaza e inserta en `rejected_records` con motivo detallado      |
+| `stores`           | `surface_m2` debe ser numérico > 0                            | Se rechaza e inserta en `rejected_records`                           |
+| `order_details`    | `quantity` > 0, `unit_price` >= 0, `discount_pct` >= 0        | Se rechaza e inserta en `rejected_records`                           |
+| `orders`           | `net_amount` debe ser numérico >= 0                           | Se rechaza e inserta en `rejected_records`                           |
+| `customers` / varios| Datos mal formados (ej. strings en columnas numéricas)        | Se convierten a Null (coerce) y son enviados a cuarentena (rechazados)|
+
+**Reglas de transformación aplicadas:**
 
 | Archivo      | Problema                        | Acción                                           |
 |-------------|---------------------------------|--------------------------------------------------|
@@ -204,20 +214,22 @@ El proyecto contempla **dos flujos de ejecución** bien diferenciados:
 | `customers` | Género inconsistente            | Infiere el género a partir del nombre del cliente |
 | `customers` | Clientes duplicados             | Deduplicación por nombre + ciudad + provincia, conservando el de mayor edad |
 | `customers` | Fecha de registro posterior a la primera compra | Corrige `registration_date` usando la fecha de la orden más antigua |
-| `products`  | Unidades incorrectas            | Redondea `quantity` al entero superior si la unidad no es `kg` |
+| `products`  | Categoría faltante              | Asigna el valor `'Sin Categoría'` de forma segura|
+| `products`  | Unidades en crudo            | Redondea `quantity` al entero superior si la unidad no es `kg` |
 
 **Pasos internos:**
 
-1. **Idempotencia** — Elimina y recrea `CentroMas_Staging_Clean`.
+1. **Idempotencia** — Verifica la existencia de `CentroMas_Staging_Clean` y limpia las tablas para el reproceso.
 2. **Inicialización de Lookups** — Crea tablas auxiliares (`lkp_genero_codigos`, `lkp_diccionario_nombres`) para normalización de género.
-3. **Productos** — Cruza con categorías, mapea `active_flag` a booleano.
-4. **Sucursales** — Convierte tipos de fecha y superficie.
-5. **Clientes (bloque principal):**
+3. **Validación Exhaustiva** — Revisa los tipos de datos y valores negativos utilizando casteo estricto (`errors='coerce'`).
+4. **Productos** — Cruza con categorías de manera dinámica (evitando colisión de columnas), mapea `active_flag` a booleano.
+5. **Sucursales** — Convierte tipos de fecha y alerta sobre superficies inválidas.
+6. **Clientes (bloque principal):**
    - Normaliza género mediante lookups y diccionario de nombres.
-   - Detecta y unifica duplicados, creando un `lookup_map_clientes` para reasignar órdenes.
-6. **Órdenes/Ventas** — Reasigna `customer_id` al cliente sobreviviente. Corrige fechas de registro inválidas.
-7. **Detalles de órdenes** — Aplica regla de unidades (redondeo para productos no pesables).
-8. **Carga final** — Inserta todas las tablas limpias (`clean_products`, `clean_stores`, `clean_customers`, `clean_orders`, `clean_order_details`) con una marca temporal de ejecución.
+   - Detecta y unifica duplicados, creando un `lkp_duplicados` para reasignar órdenes.
+7. **Órdenes/Ventas** — Reasigna `customer_id` al cliente sobreviviente. Corrige fechas de registro inválidas.
+8. **Detalles de órdenes** — Aplica regla de unidades (redondeo para productos no pesables).
+9. **Carga final y Cuarentena** — Inserta todas las tablas limpias y genera la tabla transversal `rejected_records` (solo si hay datos defectuosos detectados) guardando el payload en JSON.
 
 **Particularidades:**
 - Es el script más complejo del proceso.

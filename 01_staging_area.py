@@ -13,6 +13,7 @@ CSV_FILES = [
 SOURCE_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sources")
 INICIAL_DIR = os.path.join(SOURCE_BASE, "inicial")
 INCREMENTAL_DIR = os.path.join(SOURCE_BASE, "incremental")
+TESTING_DIR = os.path.join(SOURCE_BASE, "testing_errors")
 
 def recreate_database(master_uri, db_name):
     print(f"\n[*] Preparando el entorno efímero L1...")
@@ -35,10 +36,10 @@ def load_staging_area():
         return
 
     # Solicitar tipo de carga (solo si no se especificó como argumento CLI)
-    if len(sys.argv) > 1 and sys.argv[1] in ('f', 'i'):
+    if len(sys.argv) > 1 and sys.argv[1] in ('f', 'i', 't'):
         tipo_carga = sys.argv[1]
     else:
-        tipo_carga = input("\n¿Tipo de carga? (f = inicial | i = incremental):\n> ").strip().lower()
+        tipo_carga = input("\n¿Tipo de carga? (f = inicial | i = incremental | t = testing):\n> ").strip().lower()
 
     if tipo_carga == 'f':
         folder_path = INICIAL_DIR
@@ -46,8 +47,11 @@ def load_staging_area():
     elif tipo_carga == 'i':
         folder_path = INCREMENTAL_DIR
         tipo_label = "INCREMENTAL"
+    elif tipo_carga == 't':
+        folder_path = TESTING_DIR
+        tipo_label = "TESTING"
     else:
-        print(f"\n[ERROR] Opción inválida. Debe ingresar 'f' para inicial o 'i' para incremental.")
+        print(f"\n[ERROR] Opción inválida. Debe ingresar 'f', 'i' o 't'.")
         return
 
     if not os.path.exists(folder_path):

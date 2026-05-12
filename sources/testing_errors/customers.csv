@@ -1,0 +1,121 @@
+customer_id,customer_code,customer_name,gender,birth_date,city,province,region,customer_type,registration_date
+1,CUST-10001,Pedro Martínez,F,1980-04-22,Resistencia,Chaco,NEA,Minorista,2022-02-18
+2,CUST-10002,Luis Sosa,F,1982-12-28,Paraná,Entre Ríos,Centro,Mayorista,2022-10-20
+3,CUST-10003,Sofía Ramírez,F,1962-07-16,Corrientes,Corrientes,NEA,Empresa,2020-03-01
+4,CUST-10004,Jorge Fernández,F,1994-06-18,Corrientes,Corrientes,NEA,Mayorista,2025-05-25
+5,CUST-10005,Carla Sosa,F,1972-10-08,Formosa,Formosa,NEA,Mayorista,2020-01-09
+6,CUST-10006,Carlos Benítez,M,1995-12-14,Córdoba,Córdoba,Centro,Empresa,2025-06-16
+7,CUST-10007,María López,F,1963-04-01,Posadas,Misiones,NEA,Empresa,2020-09-06
+8,CUST-10008,Juan Gómez,M,2003-02-11,Rosario,Santa Fe,Centro,Empresa,2021-10-06
+9,CUST-10009,Diego Pérez,F,1964-02-24,Resistencia,Chaco,NEA,Empresa,2020-10-05
+10,CUST-10010,Pedro Pérez,F,1961-07-26,Formosa,Formosa,NEA,Empresa,2020-12-01
+11,CUST-10011,Pablo Romero,M,1981-05-24,Córdoba,Córdoba,Centro,Minorista,2023-07-10
+12,CUST-10012,Carlos Sosa,F,1984-11-30,Formosa,Formosa,NEA,Mayorista,2023-07-19
+13,CUST-10013,Juan Benítez,F,1964-07-28,Corrientes,Corrientes,NEA,Empresa,2022-05-23
+14,CUST-10014,Luis Martínez,F,1979-12-01,Santa Fe,Santa Fe,Centro,Minorista,2023-03-13
+15,CUST-10015,Sofía Ramírez,M,2005-06-15,Posadas,Misiones,NEA,Minorista,2023-05-11
+16,CUST-10016,Luis López,F,1967-08-09,Corrientes,Corrientes,NEA,Empresa,2021-09-28
+17,CUST-10017,Carlos Romero,F,1988-10-05,Santa Fe,Santa Fe,Centro,Minorista,2022-12-17
+18,CUST-10018,Carlos Gómez,F,1996-01-01,Paraná,Entre Ríos,Centro,Minorista,2020-06-29
+19,CUST-10019,Laura Rodríguez,M,1972-06-30,Resistencia,Chaco,NEA,Mayorista,2024-10-17
+20,CUST-10020,Ana Pérez,F,2006-12-12,Resistencia,Chaco,NEA,Minorista,2024-02-21
+21,CUST-10021,Pedro Rodríguez,F,1985-08-28,Posadas,Misiones,NEA,Minorista,2020-06-12
+22,CUST-10022,María Fernández,F,1989-09-24,Rosario,Santa Fe,Centro,Empresa,2024-07-22
+23,CUST-10023,María Rodríguez,F,1994-12-28,Posadas,Misiones,NEA,Minorista,2022-01-04
+24,CUST-10024,Jorge Sosa,F,1981-12-08,Rosario,Santa Fe,Centro,Minorista,2021-03-18
+25,CUST-10025,Carla Gómez,M,1977-12-15,Córdoba,Córdoba,Centro,Minorista,2025-02-28
+26,CUST-10026,Carlos Fernández,F,1960-02-15,Rosario,Santa Fe,Centro,Minorista,2024-06-20
+27,CUST-10027,Carlos Pérez,M,1989-07-03,Rosario,Santa Fe,Centro,Empresa,2024-06-25
+28,CUST-10028,Juan Pérez,M,1974-01-08,Rosario,Santa Fe,Centro,Empresa,2022-12-23
+29,CUST-10029,Ana Romero,M,1989-01-05,Resistencia,Chaco,NEA,Minorista,2024-11-22
+30,CUST-10030,Pedro Romero,F,1980-11-07,Corrientes,Corrientes,NEA,Minorista,2024-11-21
+31,CUST-10031,Diego Ramírez,F,1990-09-04,Resistencia,Chaco,NEA,Mayorista,2020-10-13
+32,CUST-10032,Valeria Martínez,F,1984-12-10,Rosario,Santa Fe,Centro,Empresa,2023-06-20
+33,CUST-10033,Laura Sosa,M,1969-06-02,Córdoba,Córdoba,Centro,Minorista,2024-09-18
+34,CUST-10034,Pablo Rodríguez,M,1994-06-07,Córdoba,Córdoba,Centro,Empresa,2020-01-02
+35,CUST-10035,Carlos Fernández,M,1986-11-29,Santa Fe,Santa Fe,Centro,Mayorista,2024-12-14
+36,CUST-10036,Pablo Fernández,M,1973-03-23,Paraná,Entre Ríos,Centro,Minorista,2023-03-08
+37,CUST-10037,Ana Fernández,M,1978-02-26,Rosario,Santa Fe,Centro,Minorista,2021-08-26
+38,CUST-10038,Juan Fernández,M,1964-07-14,Resistencia,Chaco,NEA,Mayorista,2024-08-24
+39,CUST-10039,Lucía Sosa,M,1993-11-08,Formosa,Formosa,NEA,Minorista,2021-08-27
+40,CUST-10040,Jorge Pérez,M,1977-08-19,Resistencia,Chaco,NEA,Minorista,2025-10-22
+41,CUST-10041,Juan Ramírez,F,1968-11-20,Paraná,Entre Ríos,Centro,Mayorista,2021-06-30
+42,CUST-10042,Pablo Ramírez,M,1997-09-15,Paraná,Entre Ríos,Centro,Empresa,2025-08-29
+43,CUST-10043,Carla Ramírez,M,1972-04-12,Córdoba,Córdoba,Centro,Mayorista,2025-01-17
+44,CUST-10044,Jorge Fernández,M,2004-10-07,Santa Fe,Santa Fe,Centro,Mayorista,2022-09-06
+45,CUST-10045,Sofía Pérez,M,1979-01-14,Santa Fe,Santa Fe,Centro,Minorista,2023-10-07
+46,CUST-10046,Diego Pérez,F,1971-07-14,Rosario,Santa Fe,Centro,Minorista,2024-04-17
+47,CUST-10047,Lucía Fernández,F,1995-03-22,Posadas,Misiones,NEA,Mayorista,2023-09-17
+48,CUST-10048,Pedro Gómez,F,1995-09-11,Paraná,Entre Ríos,Centro,Mayorista,2020-03-21
+49,CUST-10049,Sofía Gómez,M,1984-10-15,Córdoba,Córdoba,Centro,Mayorista,2024-09-12
+50,CUST-10050,Sofía Fernández,M,1997-02-06,Formosa,Formosa,NEA,Mayorista,2020-04-28
+51,CUST-10051,Laura Sosa,F,1999-12-07,Córdoba,Córdoba,Centro,Minorista,2025-12-27
+52,CUST-10052,Pedro Romero,F,1965-07-13,Resistencia,Chaco,NEA,Mayorista,2021-07-09
+53,CUST-10053,Luis Gómez,M,1992-01-05,Paraná,Entre Ríos,Centro,Minorista,2022-05-16
+54,CUST-10054,Laura Martínez,M,1982-12-18,Paraná,Entre Ríos,Centro,Mayorista,2022-10-30
+55,CUST-10055,Sofía Gómez,F,1989-05-25,Corrientes,Corrientes,NEA,Minorista,2020-10-08
+56,CUST-10056,Jorge Gómez,F,1975-11-20,Resistencia,Chaco,NEA,Minorista,2021-09-16
+57,CUST-10057,Luis Benítez,F,1977-07-22,Formosa,Formosa,NEA,Mayorista,2022-11-15
+58,CUST-10058,Luis Romero,F,1972-09-10,Rosario,Santa Fe,Centro,Minorista,2021-03-18
+59,CUST-10059,Carlos Romero,M,1993-08-02,Resistencia,Chaco,NEA,Minorista,2020-11-07
+60,CUST-10060,Ana López,F,1961-09-07,Formosa,Formosa,NEA,Minorista,2025-12-22
+61,CUST-10061,Pablo Martínez,F,2003-05-24,Córdoba,Córdoba,Centro,Minorista,2020-02-21
+62,CUST-10062,Carla Benítez,F,1996-11-22,Córdoba,Córdoba,Centro,Minorista,2025-02-26
+63,CUST-10063,Pedro Rodríguez,M,2006-04-13,Posadas,Misiones,NEA,Mayorista,2025-03-19
+64,CUST-10064,Carla Romero,M,1986-12-01,Córdoba,Córdoba,Centro,Minorista,2020-12-20
+65,CUST-10065,Sofía Fernández,M,1992-01-01,Santa Fe,Santa Fe,Centro,Minorista,2020-04-27
+66,CUST-10066,Carla Martínez,F,2001-09-28,Paraná,Entre Ríos,Centro,Minorista,2023-12-24
+67,CUST-10067,Laura López,M,1958-11-29,Santa Fe,Santa Fe,Centro,Empresa,2022-02-21
+68,CUST-10068,María Sosa,M,1979-07-24,Corrientes,Corrientes,NEA,Mayorista,2025-07-03
+69,CUST-10069,Jorge Gómez,F,1984-05-25,Paraná,Entre Ríos,Centro,Minorista,2024-07-14
+70,CUST-10070,Carlos Romero,M,2000-06-16,Formosa,Formosa,NEA,Empresa,2025-12-14
+71,CUST-10071,Pedro Ramírez,M,1989-07-25,Rosario,Santa Fe,Centro,Mayorista,2023-01-14
+72,CUST-10072,Carlos Fernández,F,1975-04-12,Santa Fe,Santa Fe,Centro,Minorista,2021-05-04
+73,CUST-10073,María Fernández,M,1982-10-22,Posadas,Misiones,NEA,Empresa,2025-11-18
+74,CUST-10074,Ana Fernández,M,1978-05-30,Santa Fe,Santa Fe,Centro,Minorista,2022-01-04
+75,CUST-10075,Juan Ramírez,F,1982-08-11,Santa Fe,Santa Fe,Centro,Minorista,2020-08-11
+76,CUST-10076,Lucía Rodríguez,M,1967-03-16,Santa Fe,Santa Fe,Centro,Minorista,2023-03-10
+77,CUST-10077,Sofía Benítez,M,1974-07-17,Paraná,Entre Ríos,Centro,Minorista,2022-10-31
+78,CUST-10078,Ana Pérez,M,2002-02-12,Paraná,Entre Ríos,Centro,Minorista,2020-08-07
+79,CUST-10079,Luis Romero,M,1965-08-23,Posadas,Misiones,NEA,Minorista,2021-04-30
+80,CUST-10080,Valeria Romero,F,2004-11-18,Córdoba,Córdoba,Centro,Mayorista,2025-01-19
+81,CUST-10081,Carlos Romero,M,1985-05-25,Paraná,Entre Ríos,Centro,Empresa,2020-09-03
+82,CUST-10082,Jorge Fernández,F,1981-09-28,Corrientes,Corrientes,NEA,Minorista,2021-10-05
+83,CUST-10083,Luis Ramírez,F,1972-01-17,Formosa,Formosa,NEA,Minorista,2024-07-31
+84,CUST-10084,Lucía Romero,M,1984-02-17,Paraná,Entre Ríos,Centro,Minorista,2022-08-06
+85,CUST-10085,Lucía López,M,1964-05-21,Santa Fe,Santa Fe,Centro,Minorista,2022-12-19
+86,CUST-10086,Pedro Pérez,F,1971-05-15,Formosa,Formosa,NEA,Minorista,2021-08-05
+87,CUST-10087,Juan Rodríguez,M,1983-11-23,Corrientes,Corrientes,NEA,Mayorista,2021-05-24
+88,CUST-10088,Lucía López,M,1982-06-04,Paraná,Entre Ríos,Centro,Empresa,2025-07-15
+89,CUST-10089,Ana Romero,F,1996-10-04,Paraná,Entre Ríos,Centro,Minorista,2022-10-22
+90,CUST-10090,Ana Fernández,F,1982-03-07,Resistencia,Chaco,NEA,Empresa,2020-06-13
+91,CUST-10091,Sofía Ramírez,M,1982-12-15,Posadas,Misiones,NEA,Minorista,2024-11-20
+92,CUST-10092,Ana Benítez,M,1994-08-20,Paraná,Entre Ríos,Centro,Minorista,2023-08-08
+93,CUST-10093,Carla Rodríguez,M,1994-12-06,Corrientes,Corrientes,NEA,Mayorista,2023-03-26
+94,CUST-10094,Carla Ramírez,F,1998-10-21,Córdoba,Córdoba,Centro,Minorista,2023-07-12
+95,CUST-10095,Laura Pérez,M,2004-03-02,Santa Fe,Santa Fe,Centro,Minorista,2025-03-07
+96,CUST-10096,Juan Fernández,M,2002-09-21,Córdoba,Córdoba,Centro,Mayorista,2020-07-30
+97,CUST-10097,Carlos Ramírez,F,1983-11-04,Formosa,Formosa,NEA,Mayorista,2025-06-08
+98,CUST-10098,Juan Romero,F,1972-03-17,Corrientes,Corrientes,NEA,Minorista,2020-02-26
+99,CUST-10099,Ana Fernández,F,1999-05-26,Córdoba,Córdoba,Centro,Minorista,2021-09-22
+100,CUST-10100,Lucía López,M,1995-04-11,Paraná,Entre Ríos,Centro,Mayorista,2025-04-18
+101,CUST-10101,Sofía Ramírez,F,1992-05-31,Formosa,Formosa,NEA,Minorista,2025-09-12
+102,CUST-10102,Carla Pérez,M,1995-03-24,Posadas,Misiones,NEA,Minorista,2025-09-10
+103,CUST-10103,Carla Gómez,M,1984-10-14,Santa Fe,Santa Fe,Centro,Empresa,2025-06-28
+104,CUST-10104,Sofía Ramírez,M,1988-12-18,Posadas,Misiones,NEA,Minorista,2024-03-25
+105,CUST-10105,Laura Fernández,F,1992-05-11,Paraná,Entre Ríos,Centro,Minorista,2024-08-09
+106,CUST-10106,Laura Benítez,M,1992-08-21,Resistencia,Chaco,NEA,Minorista,2025-07-21
+107,CUST-10107,Luis Ramírez,M,1967-01-02,Resistencia,Chaco,NEA,Mayorista,2021-02-12
+108,CUST-10108,Juan Rodríguez,M,1971-11-07,Paraná,Entre Ríos,Centro,Minorista,2025-04-07
+109,CUST-10109,Laura Romero,M,1965-03-16,Santa Fe,Santa Fe,Centro,Minorista,2025-12-25
+110,CUST-10110,Laura Benítez,F,1964-02-21,Córdoba,Córdoba,Centro,Minorista,2023-03-23
+111,CUST-10111,Lucía Pérez,M,1966-10-31,Formosa,Formosa,NEA,Minorista,2024-12-22
+112,CUST-10112,Lucía López,F,1962-02-16,Posadas,Misiones,NEA,Minorista,2020-08-17
+113,CUST-10113,Laura Martínez,M,1971-01-23,Santa Fe,Santa Fe,Centro,Minorista,2025-12-15
+114,CUST-10114,Valeria Rodríguez,F,1973-09-15,Córdoba,Córdoba,Centro,Minorista,2024-04-15
+115,CUST-10115,Sofía Romero,F,1978-10-31,Formosa,Formosa,NEA,Mayorista,2022-11-06
+116,CUST-10116,Carlos Gómez,M,1983-10-22,Paraná,Entre Ríos,Centro,Empresa,2021-10-09
+117,CUST-10117,Sofía Martínez,M,1996-01-25,Corrientes,Corrientes,NEA,Minorista,2025-02-14
+118,CUST-10118,María Sosa,M,1967-07-27,Santa Fe,Santa Fe,Centro,Minorista,2024-04-11
+119,CUST-10119,Valeria López,M,1959-12-20,Rosario,Santa Fe,Centro,Mayorista,2023-01-29
+120,CUST-10120,Valeria Gómez,M,1983-09-05,Resistencia,Chaco,NEA,Minorista,2023-12-14
