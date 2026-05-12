@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 import os
+import sys
 from db_conexion import obtener_uris
 
 CSV_FILES = [
@@ -33,8 +34,11 @@ def load_staging_area():
         print(f"\n[ERROR FATAL] {e}")
         return
 
-    # Solicitar tipo de carga
-    tipo_carga = input("\n¿Tipo de carga? (f = inicial | i = incremental):\n> ").strip().lower()
+    # Solicitar tipo de carga (solo si no se especificó como argumento CLI)
+    if len(sys.argv) > 1 and sys.argv[1] in ('f', 'i'):
+        tipo_carga = sys.argv[1]
+    else:
+        tipo_carga = input("\n¿Tipo de carga? (f = inicial | i = incremental):\n> ").strip().lower()
 
     if tipo_carga == 'f':
         folder_path = INICIAL_DIR

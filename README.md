@@ -40,6 +40,28 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 
 ---
 
+## Orquestador Automático (Recomendado)
+
+En lugar de ejecutar cada script manualmente, puede utilizar el **orquestador** `run_etl.py` que guía al usuario mediante un menú interactivo y ejecuta los scripts en el orden correcto para cada flujo:
+
+```bash
+python run_etl.py
+```
+
+El orquestador muestra un menú con las siguientes opciones:
+
+```
+   1. CARGA INICIAL (primera vez)
+   2. CARGA INCREMENTAL (ejecución periódica)
+   3. SALIR
+```
+
+Cada flujo se compone de varios pasos que pueden confirmarse, saltarse o cancelarse individualmente. Si algún script falla, el flujo se aborta automáticamente para evitar errores en cascada.
+
+> **Nota:** Si es la primera ejecución y no existe `db_config.json`, el orquestador ejecutará los scripts que a su vez iniciarán el asistente de configuración de base de datos automáticamente.
+
+---
+
 ## Flujos de Trabajo
 
 El proyecto contempla **dos flujos de ejecución** bien diferenciados:
@@ -273,7 +295,23 @@ El proyecto contempla **dos flujos de ejecución** bien diferenciados:
 
 ## Ejecución Completa (Paso a Paso)
 
-### Flujo 1: Carga Inicial (primera vez)
+### Método recomendado: Usando el Orquestador
+
+```bash
+python run_etl.py
+```
+
+Luego seleccionar:
+- **Opción 1** para la **carga inicial** (primera vez)
+- **Opción 2** para la **carga incremental** (ejecución periódica)
+
+El orquestador se encargará de ejecutar cada script en el orden correcto y abortará ante cualquier error.
+
+---
+
+### Método manual: Ejecución script por script
+
+#### Flujo 1: Carga Inicial (primera vez)
 
 ```bash
 # 1. Configurar la conexión (se ejecuta automáticamente si no existe db_config.json)
@@ -292,7 +330,7 @@ python 02_staging_clean.py
 python 03_carga_Inicial_dw.py
 ```
 
-### Flujo 2: Carga Incremental (ejecución periódica)
+#### Flujo 2: Carga Incremental (ejecución periódica)
 
 ```bash
 # 1. Cargar solo los nuevos archivos CSV (los que no se hayan procesado antes)
