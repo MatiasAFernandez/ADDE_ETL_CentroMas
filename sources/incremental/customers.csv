@@ -1,0 +1,7 @@
+customer_id,customer_code,customer_name,gender,birth_date,city,province,region,customer_type,registration_date
+95,CUST-10095,Laura Pérez,M,2004-03-02,Santa Fe,Santa Fe,Centro,Mayorista,2025-03-07
+3,CUST-10003,Sofía Ramírez,F,1962-07-16,Jujuy,Jujuy,NOA,Empresa,2020-03-01
+14,CUST-10014,Luis Martínez,F,1979-12-01,Salta,Salta,NOA,Mayorista,2023-03-13
+121,CUST-10121,Romina Vargas,M,1980-08-28,Mendoza,Mendoza,Cuyo,Minorista,2025-05-03
+122,CUST-10122,Camila González,M,2003-11-23,San Juan,San Juan,Cuyo,Minorista,2025-01-13
+123,CUST-10123,Leandro Vega,M,1993-07-20,Corrientes,Corrientes,NEA,Mayorista,2025-04-28

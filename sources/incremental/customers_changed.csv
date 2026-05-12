@@ -1,0 +1,26 @@
+customer_id,customer_code,customer_name,gender,birth_date,city,province,region,customer_type,registration_date
+95,CUST-10095,Laura Pérez,M,2004-03-02,Santa Fe,Santa Fe,Centro,Mayorista,2025-03-07
+3,CUST-10003,Sofía Ramírez,F,1962-07-16,Jujuy,Jujuy,NOA,Empresa,2020-03-01
+14,CUST-10014,Luis Martínez,F,1979-12-01,Salta,Salta,NOA,Mayorista,2023-03-13
+104,CUST-10104,Sofía Ramírez,M,1988-12-18,Santa Fe,Santa Fe,Centro,Mayorista,2024-03-25
+40,CUST-10040,Jorge Pérez,M,1977-08-19,Resistencia,Chaco,NEA,Mayorista,2025-10-22
+10,CUST-10010,Pedro Pérez,F,1961-07-26,San Juan,San Juan,Cuyo,Empresa,2020-12-01
+75,CUST-10075,Juan Ramírez,F,1982-08-11,Paraná,Entre Ríos,Centro,Mayorista,2020-08-11
+5,CUST-10005,Carla Sosa,F,1972-10-08,Formosa,Formosa,NEA,Empresa,2020-01-09
+8,CUST-10008,Juan Gómez,M,2003-02-11,Corrientes,Corrientes,NEA,Empresa,2021-10-06
+54,CUST-10054,Laura Martínez,M,1982-12-18,Paraná,Entre Ríos,Centro,Empresa,2022-10-30
+39,CUST-10039,Lucía Sosa,M,1993-11-08,La Plata,Buenos Aires,AMBA,Minorista,2021-08-27
+48,CUST-10048,Pedro Gómez,F,1995-09-11,Jujuy,Jujuy,NOA,Mayorista,2020-03-21
+72,CUST-10072,Carlos Fernández,F,1975-04-12,La Plata,Buenos Aires,AMBA,Minorista,2021-05-04
+81,CUST-10081,Carlos Romero,M,1985-05-25,La Plata,Buenos Aires,AMBA,Empresa,2020-09-03
+91,CUST-10091,Sofía Ramírez,M,1982-12-15,Santa Fe,Santa Fe,Centro,Mayorista,2024-11-20
+76,CUST-10076,Lucía Rodríguez,M,1967-03-16,Posadas,Misiones,NEA,Mayorista,2023-03-10
+74,CUST-10074,Ana Fernández,M,1978-05-30,Santa Fe,Santa Fe,Centro,Mayorista,2022-01-04
+38,CUST-10038,Juan Fernández,M,1964-07-14,Posadas,Misiones,NEA,Mayorista,2024-08-24
+25,CUST-10025,Carla Gómez,M,1977-12-15,Córdoba,Córdoba,Centro,Mayorista,2025-02-28
+97,CUST-10097,Carlos Ramírez,F,1983-11-04,Mar del Plata,Buenos Aires,AMBA,Mayorista,2025-06-08
+13,CUST-10013,Juan Benítez,F,1964-07-28,Salta,Salta,NOA,Empresa,2022-05-23
+51,CUST-10051,Laura Sosa,F,1999-12-07,Tucumán,Tucumán,NOA,Minorista,2025-12-27
+52,CUST-10052,Pedro Romero,F,1965-07-13,Corrientes,Corrientes,NEA,Mayorista,2021-07-09
+23,CUST-10023,María Rodríguez,F,1994-12-28,Paraná,Entre Ríos,Centro,Minorista,2022-01-04
+34,CUST-10034,Pablo Rodríguez,M,1994-06-07,Rosario,Santa Fe,Centro,Empresa,2020-01-02

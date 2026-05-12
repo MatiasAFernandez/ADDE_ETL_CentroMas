@@ -108,7 +108,7 @@ def ejecutar_carga_incremental():
                         
                         # 2. Limpieza de strings para evitar fallos por espacios invisibles
                         cat_dw = str(current_dw_prod.categoria_nombre or "").strip()
-                        cat_stg = str(row['category_name_y'] or "").strip()
+                        cat_stg = str(row['category_name'] or "").strip()
 
                         # 3. Comparación robusta: ¿La diferencia es mayor a 1 centavo?
                         hubo_cambio = (
@@ -135,7 +135,7 @@ def ejecutar_carga_incremental():
                         conn.execute(text("""
                             INSERT INTO Dim_Producto (id_producto_bk, producto_nombre, marca_nombre, categoria_nombre, costo_unidad, precio_lista, fecha_inicio, es_actual)
                             VALUES (:bk, :nom, :marca, :cat, :costo, :precio, :fi, 1)
-                        """), {"bk": row['sku'], "nom": row['product_name'], "marca": row['brand'], "cat": str(row['category_name_y']).strip(), 
+                        """), {"bk": row['sku'], "nom": row['product_name'], "marca": row['brand'], "cat": str(row['category_name']).strip(), 
                                "costo": row['unit_cost'], "precio": row['list_price'], "fi": fecha_ejecucion.date()})
                         conn.commit()
                     

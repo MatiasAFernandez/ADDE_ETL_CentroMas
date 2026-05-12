@@ -80,7 +80,7 @@ def ejecutar_carga_dw():
 
         # --- 3. DIMENSIÓN PRODUCTO ---
         print("-> [3/5] Cargando Dim_Producto...")
-        df_stg_prod = pd.read_sql("SELECT sku as id_producto_bk, product_name as producto_nombre, brand as marca_nombre, category_name_y as categoria_nombre, unit_cost as costo_unidad, list_price as precio_lista, fecha_carga FROM clean_products", engine_clean)
+        df_stg_prod = pd.read_sql("SELECT sku as id_producto_bk, product_name as producto_nombre, brand as marca_nombre, category_name as categoria_nombre, unit_cost as costo_unidad, list_price as precio_lista, fecha_carga FROM clean_products", engine_clean)
         df_stg_prod['fecha_inicio'] = pd.to_datetime('1900-01-01').date()
         df_stg_prod['fecha_fin'] = None
         df_stg_prod['es_actual'] = 1

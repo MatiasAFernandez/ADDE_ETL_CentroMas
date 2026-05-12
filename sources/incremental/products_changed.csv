@@ -1,0 +1,11 @@
+product_id,sku,product_name,category_id,category_name,brand,supplier_id,unit,unit_cost,list_price,active_flag
+24,SKU-1024,Detergente 750ml,6,Limpieza,Marolio,7,unidad,1233.2,1661.0,Y
+22,SKU-1022,Tomate Kg,5,Frutas y Verduras,Huerta Litoral,10,kg,2503.94,3823.98,Y
+4,SKU-1004,Yerba Mate 1kg,1,Almacén,Favorita,2,unidad,1651.78,2094.29,N
+31,SKU-1031,Papas Fritas Congeladas 700g,8,Congelados,Marolio,2,unidad,1813.74,2705.1,Y
+5,SKU-1005,Azúcar 1kg,1,Almacén,Favorita,1,unidad,3849.2,4937.64,Y
+27,SKU-1027,Pasta Dental 90g,7,Perfumería,Sedal,8,unidad,405.55,577.66,Y
+26,SKU-1026,Shampoo 400ml,7,Perfumería,Dove,8,unidad,1208.71,1529.47,Y
+18,SKU-1018,Milanesas de Cerdo Kg,4,Carnes,Nestlé,9,kg,1738.62,2286.46,Y
+3,SKU-1003,Harina 000 1kg,1,Almacén,Favorita,1,unidad,815.65,1249.26,Y
+2,SKU-1002,Fideos Spaghetti 500g,1,Almacén,Molinos,2,unidad,3735.44,4194.13,Y

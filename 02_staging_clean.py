@@ -225,12 +225,9 @@ def ejecutar_staging_clean():
         if 'stg_products' in stg_tables:
             df_prod = pd.read_sql("SELECT * FROM stg_products", engine_stg)
             
-            # Cruce dinámico: Solo si stg_categories también vino en el incremento
-            if 'stg_categories' in stg_tables:
-                df_cat = pd.read_sql("SELECT category_id, category_name FROM stg_categories", engine_stg)
-                df_prod = df_prod.merge(df_cat, on='category_id', how='left')
-            else:
-                print("    [!] 'stg_categories' no recibida. Se asigna 'Sin Categoría'.")
+            # El category_name ya viene incluido en products.csv, no necesita merge con categories
+            if 'category_name' not in df_prod.columns:
+                print("    [!] 'category_name' no encontrado en products. Se asigna 'Sin Categoría'.")
                 df_prod['category_name'] = 'Sin Categoría'
 
             df_prod['active_flag'] = df_prod['active_flag'].map({'Y': 1, 'N': 0}).fillna(0)

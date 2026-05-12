@@ -1,7 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 import os
-import shutil
 from db_conexion import obtener_uris
 
 CSV_FILES = [
@@ -9,6 +8,10 @@ CSV_FILES = [
     'order_details.csv', 'orders.csv', 'payment_methods.csv',
     'products.csv', 'promotions.csv', 'stores.csv', 'suppliers.csv'
 ]
+
+SOURCE_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sources")
+INICIAL_DIR = os.path.join(SOURCE_BASE, "inicial")
+INCREMENTAL_DIR = os.path.join(SOURCE_BASE, "incremental")
 
 def recreate_database(master_uri, db_name):
     print(f"\n[*] Preparando el entorno efímero L1...")
@@ -30,19 +33,25 @@ def load_staging_area():
         print(f"\n[ERROR FATAL] {e}")
         return
 
-    folder_path = input("\nIngresa la ruta de la carpeta con los archivos CSV del día:\n> ").strip().strip('"').strip("'")
-    
-    if not os.path.exists(folder_path):
-        print(f"\n[ERROR] No se pudo encontrar la ruta: '{folder_path}'")
+    # Solicitar tipo de carga
+    tipo_carga = input("\n¿Tipo de carga? (f = inicial | i = incremental):\n> ").strip().lower()
+
+    if tipo_carga == 'f':
+        folder_path = INICIAL_DIR
+        tipo_label = "INICIAL"
+    elif tipo_carga == 'i':
+        folder_path = INCREMENTAL_DIR
+        tipo_label = "INCREMENTAL"
+    else:
+        print(f"\n[ERROR] Opción inválida. Debe ingresar 'f' para inicial o 'i' para incremental.")
         return
 
-    # Crear carpeta para archivar los archivos ya procesados
-    carpeta_procesados = os.path.join(folder_path, "procesados")
-    if not os.path.exists(carpeta_procesados):
-        os.makedirs(carpeta_procesados)
+    if not os.path.exists(folder_path):
+        print(f"\n[ERROR] No se encontró la carpeta '{folder_path}'. Verificá que exista la estructura 'sources/{tipo_label.lower()}/'.")
+        return
 
     print("\n==========================================")
-    print(" 🚀 INICIANDO EXTRACCIÓN DELTA A SQL SERVER")
+    print(f" 🚀 INICIANDO EXTRACCIÓN {tipo_label} A SQL SERVER")
     print("==========================================\n")
 
     recreate_database(master_uri, 'CentroMas_Staging')
@@ -68,18 +77,11 @@ def load_staging_area():
             total_records += len(df)
             tables_created += 1
             
-            # Mover el archivo a la carpeta de procesados
-            ruta_destino = os.path.join(carpeta_procesados, file_name)
-            # Si ya existía un archivo con el mismo nombre en 'procesados', lo sobrescribe
-            if os.path.exists(ruta_destino):
-                os.remove(ruta_destino)
-            shutil.move(file_path, ruta_destino)
-            
         except Exception as e:
             print(f"  [ERROR] Detalle: {e}")
 
     print(f"\n[OK] {tables_created} tablas creadas. {total_records} registros delta insertados.")
-    print(f"[*] Los archivos originales fueron movidos a la carpeta 'procesados'.")
+    print(f"[*] Los archivos permanecen en su ubicación original.")
 
 if __name__ == "__main__":
     load_staging_area()

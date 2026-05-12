@@ -1,0 +1,31 @@
+customer_id,customer_code,customer_name,gender,birth_date,city,province,region,customer_type,registration_date
+121,CUST-10121,Romina Vargas,M,1980-08-28,Mendoza,Mendoza,Cuyo,Minorista,2025-05-03
+122,CUST-10122,Camila González,M,2003-11-23,San Juan,San Juan,Cuyo,Minorista,2025-01-13
+123,CUST-10123,Leandro Vega,M,1993-07-20,Corrientes,Corrientes,NEA,Mayorista,2025-04-28
+124,CUST-10124,Tomás Pérez,M,1990-05-25,Mar del Plata,Buenos Aires,AMBA,Minorista,2025-02-22
+125,CUST-10125,Verónica Gutiérrez,F,1988-05-20,Posadas,Misiones,NEA,Mayorista,2024-08-14
+126,CUST-10126,Martín Ramírez,F,1978-04-12,Resistencia,Chaco,NEA,Mayorista,2024-07-04
+127,CUST-10127,Rodrigo González,M,2001-07-05,Jujuy,Jujuy,NOA,Minorista,2025-03-23
+128,CUST-10128,Ezequiel Martínez,F,1975-12-08,Mendoza,Mendoza,Cuyo,Empresa,2024-09-21
+129,CUST-10129,Tomás Fernández,M,1975-05-11,Buenos Aires,Buenos Aires,AMBA,Mayorista,2024-08-26
+130,CUST-10130,Tomás Herrera,M,1972-10-26,La Plata,Buenos Aires,AMBA,Mayorista,2025-02-03
+131,CUST-10131,Matías García,M,1996-05-12,Salta,Salta,NOA,Minorista,2024-12-16
+132,CUST-10132,Martín Ríos,F,1996-04-01,Mendoza,Mendoza,Cuyo,Minorista,2025-02-12
+133,CUST-10133,Ezequiel Aguilar,M,1973-06-30,Jujuy,Jujuy,NOA,Empresa,2024-07-29
+134,CUST-10134,Leandro López,M,1986-07-21,La Plata,Buenos Aires,AMBA,Minorista,2024-08-30
+135,CUST-10135,Nicolás Herrera,F,2004-10-11,Mar del Plata,Buenos Aires,AMBA,Minorista,2024-10-15
+136,CUST-10136,Carolina López,M,1966-06-30,Córdoba,Córdoba,Centro,Empresa,2025-01-02
+137,CUST-10137,Facundo García,F,1979-05-29,Corrientes,Corrientes,NEA,Mayorista,2024-07-25
+138,CUST-10138,Romina Flores,F,1997-02-23,Córdoba,Córdoba,Centro,Mayorista,2025-01-21
+139,CUST-10139,Rodrigo González,F,1995-10-04,Mar del Plata,Buenos Aires,AMBA,Mayorista,2024-07-20
+140,CUST-10140,Agustín Torres,M,1987-11-14,Córdoba,Córdoba,Centro,Minorista,2025-06-01
+141,CUST-10141,Verónica Vega,M,1994-05-30,Tucumán,Tucumán,NOA,Mayorista,2024-10-20
+142,CUST-10142,Micaela González,F,1982-12-26,Paraná,Entre Ríos,Centro,Minorista,2025-02-10
+143,CUST-10143,Natalia Torres,F,2002-10-20,Paraná,Entre Ríos,Centro,Empresa,2025-06-16
+144,CUST-10144,Camila Ramírez,F,1974-04-20,Salta,Salta,NOA,Mayorista,2024-11-26
+145,CUST-10145,Romina Álvarez,F,1977-06-12,Posadas,Misiones,NEA,Mayorista,2025-05-06
+146,CUST-10146,Antonella Pérez,F,1986-07-02,Tucumán,Tucumán,NOA,Minorista,2024-07-03
+147,CUST-10147,Tomás Álvarez,F,1997-05-20,Mar del Plata,Buenos Aires,AMBA,Empresa,2025-05-24
+148,CUST-10148,Verónica Sánchez,F,1960-04-28,Salta,Salta,NOA,Minorista,2024-12-24
+149,CUST-10149,Natalia Díaz,F,1975-01-06,Mendoza,Mendoza,Cuyo,Empresa,2024-07-01
+150,CUST-10150,Micaela Pérez,F,1985-10-16,San Juan,San Juan,Cuyo,Minorista,2025-01-30

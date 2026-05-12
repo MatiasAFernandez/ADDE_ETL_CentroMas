@@ -1,0 +1,71 @@
+entity,entity_id,entity_code,effective_date,changed_fields,scd_action
+customer,149,CUST-10149,2024-07-01,NUEVO REGISTRO,INSERT
+customer,146,CUST-10146,2024-07-03,NUEVO REGISTRO,INSERT
+customer,76,CUST-10076,2024-07-03,city: Santa Fe→Posadas | province: Santa Fe→Misiones | region: Centro→NEA | customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,126,CUST-10126,2024-07-04,NUEVO REGISTRO,INSERT
+customer,51,CUST-10051,2024-07-19,city: Córdoba→Tucumán | province: Córdoba→Tucumán | region: Centro→NOA,UPDATE (SCD2 → nueva versión)
+customer,139,CUST-10139,2024-07-20,NUEVO REGISTRO,INSERT
+customer,137,CUST-10137,2024-07-25,NUEVO REGISTRO,INSERT
+product,4,SKU-1004,2024-07-28,active_flag: Y→N (producto descontinuado),DEACTIVATE (SCD2 → versión cerrada)
+customer,133,CUST-10133,2024-07-29,NUEVO REGISTRO,INSERT
+store,8,Sucursal Paraná Este,2024-08-06,surface_m2: 2500→3000 | store_type: Express→Supermercado,UPDATE (SCD2 → nueva versión)
+product,3,SKU-1003,2024-08-11,unit_cost: 859.67→815.65 | list_price: 1316.67→1249.26 (-5.1%),UPDATE (SCD2 → nueva versión)
+customer,125,CUST-10125,2024-08-14,NUEVO REGISTRO,INSERT
+customer,129,CUST-10129,2024-08-26,NUEVO REGISTRO,INSERT
+product,5,SKU-1005,2024-08-26,unit_cost: 4352.33→3849.2 | list_price: 5583.04→4937.64 (-11.6%),UPDATE (SCD2 → nueva versión)
+customer,134,CUST-10134,2024-08-30,NUEVO REGISTRO,INSERT
+customer,3,CUST-10003,2024-09-04,city: Corrientes→Jujuy | province: Corrientes→Jujuy | region: NEA→NOA,UPDATE (SCD2 → nueva versión)
+customer,128,CUST-10128,2024-09-21,NUEVO REGISTRO,INSERT
+product,2,SKU-1002,2024-09-24,brand: Lucchetti→Molinos | list_price: 4245.07→4194.13,UPDATE (SCD2 → nueva versión)
+store,7,Sucursal Córdoba Nueva Córdoba,2024-09-26,surface_m2: 900→1400,UPDATE (SCD2 → nueva versión)
+customer,40,CUST-10040,2024-09-30,customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,8,CUST-10008,2024-10-03,city: Rosario→Corrientes,UPDATE (SCD2 → nueva versión)
+customer,135,CUST-10135,2024-10-15,NUEVO REGISTRO,INSERT
+customer,141,CUST-10141,2024-10-20,NUEVO REGISTRO,INSERT
+product,22,SKU-1022,2024-10-27,unit_cost: 2919.02→2503.94 | list_price: 4457.89→3823.98 (-14.2%),UPDATE (SCD2 → nueva versión)
+product,18,SKU-1018,2024-10-29,brand: Fresca→Nestlé | list_price: 2139.08→2286.46,UPDATE (SCD2 → nueva versión)
+customer,10,CUST-10010,2024-11-06,city: Formosa→San Juan | province: Formosa→San Juan | region: NEA→Cuyo,UPDATE (SCD2 → nueva versión)
+customer,97,CUST-10097,2024-11-11,city: Formosa→Mar del Plata | province: Formosa→Buenos Aires | region: NEA→AMBA,UPDATE (SCD2 → nueva versión)
+store,2,Sucursal Corrientes Costanera,2024-11-19,surface_m2: 1200→2500 | store_type: Express→Supermercado,UPDATE (SCD2 → nueva versión)
+customer,144,CUST-10144,2024-11-26,NUEVO REGISTRO,INSERT
+customer,23,CUST-10023,2024-11-27,city: Posadas→Paraná | province: Misiones→Entre Ríos | region: NEA→Centro,UPDATE (SCD2 → nueva versión)
+customer,25,CUST-10025,2024-12-11,customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,131,CUST-10131,2024-12-16,NUEVO REGISTRO,INSERT
+customer,81,CUST-10081,2024-12-16,city: Paraná→La Plata,UPDATE (SCD2 → nueva versión)
+customer,91,CUST-10091,2024-12-19,city: Posadas→Santa Fe | province: Misiones→Santa Fe | region: NEA→Centro | customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,148,CUST-10148,2024-12-24,NUEVO REGISTRO,INSERT
+customer,136,CUST-10136,2025-01-02,NUEVO REGISTRO,INSERT
+customer,122,CUST-10122,2025-01-13,NUEVO REGISTRO,INSERT
+customer,138,CUST-10138,2025-01-21,NUEVO REGISTRO,INSERT
+customer,150,CUST-10150,2025-01-30,NUEVO REGISTRO,INSERT
+customer,104,CUST-10104,2025-01-31,city: Posadas→Santa Fe | province: Misiones→Santa Fe | region: NEA→Centro | customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,130,CUST-10130,2025-02-03,NUEVO REGISTRO,INSERT
+customer,142,CUST-10142,2025-02-10,NUEVO REGISTRO,INSERT
+customer,34,CUST-10034,2025-02-10,city: Córdoba→Rosario | province: Córdoba→Santa Fe | region: Centro→Centro,UPDATE (SCD2 → nueva versión)
+customer,132,CUST-10132,2025-02-12,NUEVO REGISTRO,INSERT
+customer,95,CUST-10095,2025-02-21,customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,124,CUST-10124,2025-02-22,NUEVO REGISTRO,INSERT
+customer,75,CUST-10075,2025-02-23,city: Santa Fe→Paraná | province: Santa Fe→Entre Ríos | region: Centro→Centro | customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,52,CUST-10052,2025-03-19,city: Resistencia→Corrientes | province: Chaco→Corrientes | region: NEA→NEA,UPDATE (SCD2 → nueva versión)
+product,24,SKU-1024,2025-03-20,brand: Magistral→Marolio | list_price: 1655.87→1661.0,UPDATE (SCD2 → nueva versión)
+customer,127,CUST-10127,2025-03-23,NUEVO REGISTRO,INSERT
+product,27,SKU-1027,2025-03-24,unit_cost: 358.64→405.55 | list_price: 510.84→577.66 (+13.1%),UPDATE (SCD2 → nueva versión)
+customer,72,CUST-10072,2025-03-25,city: Santa Fe→La Plata | province: Santa Fe→Buenos Aires | region: Centro→AMBA,UPDATE (SCD2 → nueva versión)
+customer,48,CUST-10048,2025-03-30,city: Paraná→Jujuy | province: Entre Ríos→Jujuy | region: Centro→NOA,UPDATE (SCD2 → nueva versión)
+customer,74,CUST-10074,2025-03-30,customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+store,1,Sucursal Resistencia Centro,2025-04-13,surface_m2: 650→2500,UPDATE (SCD2 → nueva versión)
+customer,123,CUST-10123,2025-04-28,NUEVO REGISTRO,INSERT
+customer,13,CUST-10013,2025-04-28,city: Corrientes→Salta | province: Corrientes→Salta | region: NEA→NOA,UPDATE (SCD2 → nueva versión)
+customer,121,CUST-10121,2025-05-03,NUEVO REGISTRO,INSERT
+customer,145,CUST-10145,2025-05-06,NUEVO REGISTRO,INSERT
+customer,54,CUST-10054,2025-05-17,customer_type: Mayorista→Empresa,UPDATE (SCD2 → nueva versión)
+product,31,SKU-1031,2025-05-17,brand: Paty→Marolio | list_price: 2715.69→2705.1,UPDATE (SCD2 → nueva versión)
+customer,38,CUST-10038,2025-05-21,city: Resistencia→Posadas | province: Chaco→Misiones | region: NEA→NEA,UPDATE (SCD2 → nueva versión)
+customer,147,CUST-10147,2025-05-24,NUEVO REGISTRO,INSERT
+store,4,Sucursal Formosa Sur,2025-05-31,surface_m2: 3200→3500,UPDATE (SCD2 → nueva versión)
+customer,140,CUST-10140,2025-06-01,NUEVO REGISTRO,INSERT
+customer,39,CUST-10039,2025-06-06,city: Formosa→La Plata | province: Formosa→Buenos Aires | region: NEA→AMBA,UPDATE (SCD2 → nueva versión)
+product,26,SKU-1026,2025-06-15,unit_cost: 965.27→1208.71 | list_price: 1221.43→1529.47 (+25.2%),UPDATE (SCD2 → nueva versión)
+customer,143,CUST-10143,2025-06-16,NUEVO REGISTRO,INSERT
+customer,14,CUST-10014,2025-06-21,city: Santa Fe→Salta | province: Santa Fe→Salta | region: Centro→NOA | customer_type: Minorista→Mayorista,UPDATE (SCD2 → nueva versión)
+customer,5,CUST-10005,2025-06-24,customer_type: Mayorista→Empresa,UPDATE (SCD2 → nueva versión)

@@ -1,0 +1,4 @@
+product_id,sku,product_name,category_id,category_name,brand,supplier_id,unit,unit_cost,list_price,active_flag
+24,SKU-1024,Detergente 750ml,6,Limpieza,Marolio,7,unidad,1233.2,1661.0,Y
+22,SKU-1022,Tomate Kg,5,Frutas y Verduras,Huerta Litoral,10,kg,2503.94,3823.98,Y
+4,SKU-1004,Yerba Mate 1kg,1,Almacén,Favorita,2,unidad,1651.78,2094.29,N
