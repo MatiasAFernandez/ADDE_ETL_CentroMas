@@ -382,7 +382,3 @@ Dim_Cliente (sk_cliente, id_cliente_bk, genero, edad, tipo_cliente, ciudad_clien
 
 Fact_Venta (sk_venta, sk_tiempo, sk_cliente, sk_producto, sk_sucursal, nro_ticket, cantidad_vendida, precio_unitario, monto_bruto, descuento_aplicado, monto_neto)
 ```
-
-**Volumen de datos resultante:**
-- Aproximadamente **23.410 registros** en la tabla de hechos `Fact_Venta`
-- **4 dimensiones** pobladas con datos limpios y deduplicados
