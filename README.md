@@ -35,7 +35,7 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 
 3. Instalar las librerías requeridas:
    ```bash
-   pip install pandas sqlalchemy pymssql
+   pip install -r requirements.txt
    ```
 
 ---
