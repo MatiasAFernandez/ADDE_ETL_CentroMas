@@ -13,8 +13,8 @@ Poner en práctica conceptos fundamentales de integración de datos, modelado mu
 - **Python 3** como lenguaje de automatización del proceso ETL
 - **Microsoft SQL Server** como motor de base de datos
 - **pandas** para transformación y manipulación de datos
-- **SQLAlchemy + pymssql** como puente de conexión entre Python y SQL Server
-- **Driver ODBC 18 para SQL Server**
+- **SQLAlchemy** como ORM / motor de conexión
+- **pymssql** (FreeTDS) o **pyodbc + ODBC Driver 18** como drivers de conexión a SQL Server (a elección del usuario)
 
 **Se recomienda crear un entorno virtual para instalar las librerías necesarias:**
 
@@ -363,12 +363,35 @@ python 04_carga_incremental.py
 
 Al ejecutar cualquier script por primera vez, se solicitará:
 
-1. **Servidor SQL Server** (por defecto: `localhost`)
+1. **Servidor SQL Server** (por defecto: `127.0.0.1`)
 2. **Tipo de autenticación**: Windows (`Trusted Connection`) o SQL Server
 3. **Usuario y contraseña** (solo para autenticación SQL Server)
-4. **Driver ODBC** para SQL Server (lista los disponibles en el equipo)
+4. **Método de conexión**: pymssql (FreeTDS) o pyodbc (ODBC Driver 18)
 
 Esta configuración se guarda en `db_config.json` y se reutiliza automáticamente.
+
+---
+
+### Opciones de Conexión a SQL Server
+
+El programa permite elegir entre **dos métodos de conexión** a SQL Server durante la configuración inicial. Ambos son compatibles con SQLAlchemy y el resto del ETL funciona de forma transparente.
+
+#### Opción 1: pymssql (FreeTDS) — *Por defecto*
+
+- **Ventaja:** No requiere instalar ningún driver ODBC adicional. Funciona con FreeTDS incluido en la librería.
+- **URI generada:** `mssql+pymssql://usuario:contraseña@servidor:1433/base_datos?charset=utf8`
+- **Recomendado para:** Entornos Linux/Docker donde la instalación del driver ODBC puede ser más compleja.
+
+#### Opción 2: pyodbc + ODBC Driver 18 for SQL Server
+
+- **Ventaja:** Conexión nativa de Microsoft, mejor rendimiento y compatibilidad con características específicas de SQL Server.
+- **URI generada:** `mssql+pyodbc://usuario:contraseña@servidor:1433/base_datos?driver=ODBC+Driver+18+for+SQL+Server`
+- **Requerimientos:**
+  1. El módulo `pyodbc` debe estar instalado (incluido en `requirements.txt`).
+  2. El **'ODBC Driver 18 for SQL Server'** debe estar instalado en el sistema. Puedes descargarlo desde:
+     - [Microsoft ODBC Driver 18 for SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
+- **Nota:** Si eliges esta opción pero el driver ODBC 18 no está instalado, el programa te mostrará una advertencia con las instrucciones para instalarlo, pero guardará la configuración igualmente. La conexión fallará hasta que instales el driver.
+- **Recomendado para:** Entornos Windows donde el driver ODBC suele estar preinstalado o es fácil de instalar.
 
 ---
 

@@ -8,12 +8,12 @@ CONFIG_FILE = "db_config.json"
 def generar_configuracion():
     """Pregunta los datos por consola y los guarda en un archivo JSON local."""
     print("==========================================")
-    print(" ⚙️ CONFIGURACIÓN GLOBAL DE BASE DE DATOS (pymssql)")
+    print(" ⚙️ CONFIGURACIÓN GLOBAL DE BASE DE DATOS")
     print("==========================================")
 
     # Forzar 127.0.0.1 en lugar de localhost para evitar problemas de IPv6 en Linux
     server = (
-        input("Servidor SQL (Ej: 127.0.0.1) [Enter para '127.0.0.1']: ").strip()
+        input("Servidor SQL (Ej: 127.0.0.1) [Enter para 'localhost']: ").strip()
         or "127.0.0.1"
     )
 
@@ -29,11 +29,38 @@ def generar_configuracion():
         user = input("Usuario [Enter para 'sa']: ").strip() or "sa"
         password = input("Contraseña: ").strip()
 
+    print("\nMétodo de conexión:")
+    print("1. pymssql (FreeTDS)  — Método por defecto, no requiere driver ODBC")
+    print("2. pyodbc (ODBC Driver 18)  — Requiere 'ODBC Driver 18 for SQL Server' instalado")
+    driver_option = input("Elige (1 o 2) [Enter para 1]: ").strip() or "1"
+
+    driver = "pymssql"
+    if driver_option == "2":
+        driver = "pyodbc"
+        try:
+            import pyodbc
+
+            drivers_disponibles = pyodbc.drivers()
+            if "ODBC Driver 18 for SQL Server" not in drivers_disponibles:
+                print("\n⚠️  ADVERTENCIA: No se detectó 'ODBC Driver 18 for SQL Server' entre los drivers ODBC instalados.")
+                print("   Para usar pyodbc necesitas instalar el driver desde:")
+                print("   https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server")
+                print("   La configuración se guardará igualmente.\n")
+            else:
+                print("[OK] 'ODBC Driver 18 for SQL Server' detectado correctamente.\n")
+        except ImportError:
+            print("\n⚠️  ADVERTENCIA: El módulo 'pyodbc' no está instalado.")
+            print("   Instálalo con: pip install pyodbc")
+            print("   Además necesitas instalar 'ODBC Driver 18 for SQL Server' desde:")
+            print("   https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server")
+            print("   La configuración se guardará igualmente.\n")
+
     config = {
         "server": server,
         "auth_type": auth_type,
         "user": user,
         "password": password,
+        "driver": driver,
         "csv_path": "",
     }
 
@@ -61,7 +88,7 @@ def actualizar_configuracion(config):
 
 
 def obtener_uris():
-    """Lee la configuración y devuelve las URIs de conexión usando pymssql."""
+    """Lee la configuración y devuelve las URIs de conexión usando el driver elegido (pymssql o pyodbc)."""
     config = leer_configuracion()
 
     server = config["server"]
@@ -70,17 +97,40 @@ def obtener_uris():
     if server.lower() == "localhost":
         server = "127.0.0.1"
 
-    if config.get("auth_type", "2") == "1":
-        base_uri = f"mssql+pymssql://@{server}/{{db}}"
-    else:
-        user = config.get("user", "sa")
-        pwd = config.get("password", "")
-        encoded_pwd = urllib.parse.quote_plus(pwd)
+    driver = config.get("driver", "pymssql")
 
-        # Añadir charset=utf8 por seguridad para pymssql
-        base_uri = (
-            f"mssql+pymssql://{user}:{encoded_pwd}@{server}:1433/{{db}}?charset=utf8"
-        )
+    if driver == "pyodbc":
+        # URI con pyodbc + ODBC Driver 18
+        if config.get("auth_type", "2") == "1":
+            # Autenticación de Windows
+            base_uri = (
+                f"mssql+pyodbc://@{server}/{{db}}"
+                f"?driver=ODBC+Driver+18+for+SQL+Server"
+                f"&trusted_connection=yes"
+                f"&TrustServerCertificate=yes"
+            )
+        else:
+            user = config.get("user", "sa")
+            pwd = config.get("password", "")
+            encoded_pwd = urllib.parse.quote_plus(pwd)
+            base_uri = (
+                f"mssql+pyodbc://{user}:{encoded_pwd}@{server}:1433/{{db}}"
+                f"?driver=ODBC+Driver+18+for+SQL+Server"
+                f"&TrustServerCertificate=yes"
+            )
+    else:
+        # URI con pymssql (comportamiento por defecto)
+        if config.get("auth_type", "2") == "1":
+            base_uri = f"mssql+pymssql://@{server}/{{db}}"
+        else:
+            user = config.get("user", "sa")
+            pwd = config.get("password", "")
+            encoded_pwd = urllib.parse.quote_plus(pwd)
+
+            # Añadir charset=utf8 por seguridad para pymssql
+            base_uri = (
+                f"mssql+pymssql://{user}:{encoded_pwd}@{server}:1433/{{db}}?charset=utf8"
+            )
 
     master_uri = base_uri.format(db="master")
     staging_uri = base_uri.format(db="CentroMas_Staging")

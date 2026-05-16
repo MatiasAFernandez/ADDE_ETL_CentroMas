@@ -1,5 +1,6 @@
 greenlet==3.5.0
 numpy==2.4.4
+pyodbc==5.2.0
 pandas==3.0.3
 pymssql==2.3.13
 python-dateutil==2.9.0.post0
