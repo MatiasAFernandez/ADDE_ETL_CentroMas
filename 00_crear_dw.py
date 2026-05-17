@@ -101,13 +101,30 @@ def build_data_warehouse(dw_uri):
                monto_bruto         DECIMAL(12,2)   NOT NULL,
                descuento_aplicado  DECIMAL(12,2)   NOT NULL DEFAULT 0,
                monto_neto          DECIMAL(12,2)   NOT NULL,
+               last_updated        DATETIME        NOT NULL DEFAULT GETDATE(),
+               row_hash            VARCHAR(32)     NOT NULL,
                CONSTRAINT FK_Fact_Venta_Tiempo    FOREIGN KEY (sk_tiempo)    REFERENCES dbo.Dim_Tiempo(sk_tiempo),
                CONSTRAINT FK_Fact_Venta_Cliente   FOREIGN KEY (sk_cliente)   REFERENCES dbo.Dim_Cliente(sk_cliente),
                CONSTRAINT FK_Fact_Venta_Producto  FOREIGN KEY (sk_producto)  REFERENCES dbo.Dim_Producto(sk_producto),
                CONSTRAINT FK_Fact_Venta_Sucursal  FOREIGN KEY (sk_sucursal)  REFERENCES dbo.Dim_Sucursal(sk_sucursal)
             );
         """,
-        "8. Creación ETL_Logs (Auditoría)": """
+        "8. Creación Fact_Venta_ChangeLog": """
+            IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Fact_Venta_ChangeLog]') AND type in (N'U'))
+            BEGIN
+                CREATE TABLE dbo.Fact_Venta_ChangeLog (
+                    id_cambio       INT IDENTITY(1,1) PRIMARY KEY,
+                    nro_ticket      INT             NOT NULL,
+                    tipo_cambio     VARCHAR(10)     NOT NULL CHECK (tipo_cambio IN ('INSERT', 'UPDATE', 'DELETE')),
+                    fecha_cambio    DATETIME        NOT NULL DEFAULT GETDATE(),
+                    hash_anterior   VARCHAR(32)     NULL,
+                    hash_nuevo      VARCHAR(32)     NULL,
+                    ejecucion_etl   VARCHAR(100)    NOT NULL,
+                    detalle         VARCHAR(MAX)    NULL
+                );
+            END
+        """,
+        "9. Creación ETL_Logs (Auditoría)": """
             IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[ETL_Logs]') AND type in (N'U'))
             BEGIN
                 CREATE TABLE dbo.ETL_Logs (

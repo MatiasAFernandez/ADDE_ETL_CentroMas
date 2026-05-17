@@ -1,5 +1,6 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
+import hashlib
+from sqlalchemy import create_engine, text, types
 from db_conexion import obtener_uris
 from datetime import datetime
 
@@ -13,6 +14,21 @@ def calcular_edad(fecha_nacimiento):
     if pd.isnull(fecha_nacimiento): return None
     hoy = datetime.now()
     return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+
+def calcular_hash(row):
+    """
+    Genera un hash MD5 consistente para una fila de Fact_Venta.
+    Debe coincidir EXACTAMENTE con la función en 04_carga_incremental.py
+    para que la comparación CDC funcione correctamente.
+    """
+    raw = (
+        str(row['cantidad_vendida']) + '|' +
+        str(row['precio_unitario']) + '|' +
+        str(row['monto_bruto']) + '|' +
+        str(row['descuento_aplicado']) + '|' +
+        str(row['monto_neto'])
+    )
+    return hashlib.md5(raw.encode('utf-8')).hexdigest()
 
 def ejecutar_carga_dw():
     try:
@@ -142,11 +158,19 @@ def ejecutar_carga_dw():
         df_fact = df_fact.merge(map_cli_final, on='customer_id', how='left')
         df_fact['sk_cliente'] = df_fact['sk_cliente'].fillna(-1).astype(int)
 
-        # 5.4 CARGA FINAL
+        # 5.4 CARGA FINAL (CON HASH Y LAST_UPDATED)
+        print("    -> Calculando hash de integridad para cada fila...")
+        # Usar la función calcular_hash() que es idéntica a la de 04_carga_incremental.py
+        # para garantizar consistencia en la comparación CDC.
+        df_fact['row_hash'] = df_fact.apply(calcular_hash, axis=1)
+        df_fact['last_updated'] = datetime.now()
+
         cols_fact = ['sk_tiempo', 'sk_cliente', 'sk_producto', 'sk_sucursal', 'nro_ticket', 
-                     'cantidad_vendida', 'precio_unitario', 'monto_bruto', 'descuento_aplicado', 'monto_neto']
+                     'cantidad_vendida', 'precio_unitario', 'monto_bruto', 'descuento_aplicado', 
+                     'monto_neto', 'last_updated', 'row_hash']
         
-        df_fact[cols_fact].to_sql('Fact_Venta', engine_dw, if_exists='append', index=False, chunksize=5000)
+        df_fact[cols_fact].to_sql('Fact_Venta', engine_dw, if_exists='append', index=False, chunksize=5000,
+                                  dtype={'last_updated': types.DateTime, 'row_hash': types.String(32)})
 
         print("\n[ÉXITO] El Data Warehouse ha sido cargado completamente.")
         print("------------------------------------------")
